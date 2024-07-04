@@ -1,43 +1,107 @@
-from data.data_preprocessing import load_data, preprocess_data
-from models.meta_learners import TLearner
 import pandas as pd
-from sklearn.model_selection import train_test_split
+# Import the necessary functions from the scripts
+from models.Meta_Learners.s_Learner import s_fit, predict_outcomes, estimate_CATE
+from models.Meta_Learners.x_learner import x_fit, predict_outcomes_x, estimate_CATE_x
+from models.Meta_Learners.r_learner import r_fit, predict_outcomes_r, estimate_CATE_r
+from models.Meta_Learners.t_learner import t_fit, predict_outcomes_t, estimate_CATE_t
+from data import data_preprocessing
 
 
-def train_and_predict(data_path):
-    """
-        Loads data, preprocesses it, splits it, trains a T-Learner, and saves predictions.
-        :param data_path: Path to the CSV file containing the data.
+class TrainAndPredict:
+    def __init__(self, data):
         """
-    # Load and preprocess the data
-    data = load_data(data_path)
-    data = preprocess_data(data)
+        Initialize the TrainAndPredict class with the dataset.
 
-    # Prepare data for modeling
-    X = data.drop(['Y'], axis=1)  # Features
-    y = data['Y']  # Outcome
-    treatment = data['Z']  # Treatment indicator
+        Parameters:
+        data: pd.DataFrame, the preprocessed dataset
+        """
+        self.data = data
 
-    # treatment is the binary indicator used for stratification to ensure the training and testing sets contain a
-    # similar mix of treated and control observations.
-    # Split the data into training and testing sets, stratifying by treatment to maintain balance
-    X_train, X_test, y_train, y_test, treatment_train, treatment_test = train_test_split(
-        X, y, treatment, test_size=0.2, random_state=42, stratify=treatment)
+    def extract_features(self):
+        """
+        Extract covariates, treatment, and outcome from preprocessed data.
 
-    # Initialize and train the T-Learner
-    t_learner = TLearner()
-    t_learner.fit(X_train, treatment_train, y_train)
+        Returns:
+        treatment_col: str, treatment assignment column name
+        outcome_col: str, outcome variable column name
+        covariate_cols: list of str, covariate variable column names
+        """
+        # Define columns
+        treatment_col = 'GrowthMindsetIntervention'
+        outcome_col = 'StudentAchievementScore'
+        covariate_cols = [
+            'FutureSuccessExpectations', 'StudentRaceEthnicity', 'StudentGender',
+            'FirstGenCollegeStatus', 'SchoolUrbanicity', 'PreInterventionFixedMindset',
+            'SchoolAchievementLevel', 'SchoolMinorityComposition', 'PovertyConcentration',
+            'TotalStudentPopulation'
+        ]
+        return treatment_col, outcome_col, covariate_cols
 
-    # Predict the effects on the test set
-    predicted_treated, predicted_control = t_learner.predict(X_test)
+    def train_and_predict(self):
+        """
+        Train the S-Learner model and predict the CATE.
 
-    # Save the predictions to a CSV file for further analysis
-    predictions_df = pd.DataFrame({
-        'Predicted Treated': predicted_treated,
-        'Predicted Control': predicted_control
-    })
-    predictions_df.to_csv('../results/predictions.csv', index=False)
+        Returns:
+        CATE: pd.Series, the Conditional Average Treatment Effect estimates
+        """
+        treatment_col, outcome_col, covariate_cols = self.extract_features()
+
+        # S-Learner
+        s_model = s_fit(self.data, treatment_col, outcome_col, covariate_cols)
+        s_predictions = predict_outcomes(self.data[covariate_cols], s_model, treatment_col)
+        s_cate = estimate_CATE(s_predictions)
+        data_with_s_cate = self.data.copy()
+        data_with_s_cate['s_CATE']=s_cate
 
 
+        # T-Learner
+        t_model_treated, t_model_control = t_fit(self.data, treatment_col, outcome_col, covariate_cols)
+        t_predictions = predict_outcomes_t(self.data[covariate_cols], t_model_treated, t_model_control)
+        t_cate = estimate_CATE_t(t_predictions)
+        data_with_t_cate = self.data.copy()
+        data_with_t_cate['t_CATE'] = t_cate
+
+        # X-Learner
+        x_model_treated, x_model_control = x_fit(self.data, treatment_col, outcome_col, covariate_cols)
+        x_predictions = predict_outcomes_x(self.data[covariate_cols], x_model_treated, x_model_control)
+        x_cate = estimate_CATE_x(x_predictions)
+        data_with_x_cate = self.data.copy()
+        data_with_x_cate['x_CATE'] = x_cate
+
+        # R-Learner
+        r_tau_model, r_y_model, r_t_model = r_fit(self.data, treatment_col, outcome_col, covariate_cols)
+        r_predictions = predict_outcomes_r(self.data[covariate_cols], r_tau_model, r_y_model, r_t_model)
+        r_cate = estimate_CATE_r(r_predictions)
+        data_with_r_cate = self.data.copy()
+        data_with_r_cate['r_CATE'] = r_cate
+
+
+        # Save or print the CATE estimates
+        print("S-Learner CATE:", data_with_s_cate)
+        print("X-Learner CATE:", data_with_x_cate)
+        print("R-Learner CATE:", data_with_r_cate)
+        print("T-Learner CATE:", data_with_t_cate)
+
+        return data_with_s_cate, data_with_t_cate, data_with_x_cate, data_with_r_cate
+
+
+# Example usage within the same script, if run as a standalone for testing:
 if __name__ == '__main__':
-    train_and_predict('../data/dataset.csv')
+    path = '../data/dataset.csv'  # Replace with the actual path to your dataset
+    processed_data = data_preprocessing.preprocess_data(path)  # Get the preprocessed data
+    tp = TrainAndPredict(processed_data)
+    s_estimates, t_estimates, x_estimates, r_estimates = tp.train_and_predict()
+    print(s_estimates, t_estimates, x_estimates, r_estimates)
+
+    # Save the CATE estimates to a CSV file
+    s_output_path = '../results/s_predictions.csv'
+    t_output_path = '../results/t_predictions.csv'
+    x_output_path = '../results/x_predictions.csv'
+    r_output_path = '../results/r_predictions.csv'
+
+    s_estimates.to_csv(s_output_path, index=False)
+    t_estimates.to_csv(t_output_path, index=False)
+    x_estimates.to_csv(x_output_path, index=False)
+    r_estimates.to_csv(r_output_path, index=False)
+
+    print(f"CATE estimates saved to: output_path")
