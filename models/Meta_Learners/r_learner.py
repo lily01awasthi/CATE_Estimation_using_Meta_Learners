@@ -32,11 +32,15 @@ def r_fit(data, treatment_col, outcome_col, covariate_cols):
     y_residual = y - y_model.predict(X)
     t_residual = T - t_model.predict(X)
 
+    # Clip t_residual to avoid extremely small values
+    t_residual_clipped = t_residual.clip(lower=0.01)
+
+
     # Step 3: Fit a model on the residuals to estimate the treatment effect
     tau_model = RandomForestRegressor(n_estimators=100, random_state=42)
-    tau_model.fit(X, y_residual / (t_residual + 1e-10))  # Adding a small value to avoid division by zero
+    tau_model.fit(X, y_residual / (t_residual_clipped + 1e-10))  # Adding a small value to avoid division by zero
 
-    return tau_model, y_model, t_model
+    return tau_model, y_model, t_model, y_residual,t_residual
 
 def predict_outcomes_r(X, tau_model, y_model, t_model):
     """

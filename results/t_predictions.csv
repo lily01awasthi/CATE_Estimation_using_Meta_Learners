@@ -1,4 +1,4 @@
-schoolid,GrowthMindsetIntervention,StudentAchievementScore,FutureSuccessExpectations,StudentRaceEthnicity,StudentGender,FirstGenCollegeStatus,SchoolUrbanicity,PreInterventionFixedMindset,SchoolAchievementLevel,SchoolMinorityComposition,PovertyConcentration,TotalStudentPopulation,t_CATE
+schoolid,GrowthMindsetIntervention,StudentAchievementScore,FutureSuccessExpectations,StudentRaceEthnicity,StudentGender,FirstGenCollegeStatus,SchoolUrbanicity,PreInterventionFixedMindset,SchoolAchievementLevel,SchoolMinorityComposition,PovertyConcentration,TotalStudentPopulation,CATE
 76,1,0.0816016721543179,6,4,2,1,4,0.334543522047309,0.648585574302655,-1.31092696938127,0.22407651434157,-0.426756652646919,0.5524576029232457
 76,1,-0.385868955117024,4,12,2,1,4,0.334543522047309,0.648585574302655,-1.31092696938127,0.22407651434157,-0.426756652646919,-0.12758299382057947
 76,1,0.39818372591719,6,4,2,0,4,0.334543522047309,0.648585574302655,-1.31092696938127,0.22407651434157,-0.426756652646919,-0.04115513201119092
