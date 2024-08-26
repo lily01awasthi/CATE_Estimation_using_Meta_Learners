@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import Lasso
 from sklearn.model_selection import train_test_split
 
 
@@ -28,8 +28,8 @@ def t_fit(data, treatment_col, outcome_col, covariate_cols):
     y_control = control_data[outcome_col]
 
     # Train separate models on the treated and control groups
-    model_treated = RandomForestRegressor(n_estimators=100, random_state=42)
-    model_control = RandomForestRegressor(n_estimators=100, random_state=42)
+    model_treated = Lasso(alpha=0.1, random_state=42)
+    model_control = Lasso(alpha=0.1, random_state=42)
 
     model_treated.fit(X_treated, y_treated)
     model_control.fit(X_control, y_control)

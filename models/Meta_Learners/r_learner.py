@@ -1,7 +1,7 @@
 import pandas as pd
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import Lasso, Ridge
 from sklearn.model_selection import train_test_split
-
+import numpy as np
 def r_fit(data, treatment_col, outcome_col, covariate_cols):
     """
     Train an R-learner model to estimate the Conditional Average Treatment Effect (CATE).
@@ -21,24 +21,27 @@ def r_fit(data, treatment_col, outcome_col, covariate_cols):
     y = data[outcome_col]
 
     # Step 1: Fit a model to predict the outcome using covariates
-    y_model = RandomForestRegressor(n_estimators=100, random_state=42)
+    y_model = Lasso(alpha=0.1, random_state=42)
     y_model.fit(X, y)
 
     # Step 2: Fit a model to predict the treatment using covariates
-    t_model = RandomForestRegressor(n_estimators=100, random_state=42)
+    t_model = Lasso(alpha=0.1, random_state=42)
     t_model.fit(X, T)
 
     # Compute residuals
     y_residual = y - y_model.predict(X)
     t_residual = T - t_model.predict(X)
 
-    # Clip t_residual to avoid extremely small values
-    t_residual_clipped = t_residual.clip(lower=0.01)
+    # t_residual_clipped = t_residual.clip(lower=0.01)
+    y_residual = (y_residual - np.mean(y_residual)) / np.std(y_residual)
 
+    # t_residual_clipped = (t_residual_clipped - np.mean(t_residual_clipped)) / np.std(t_residual_clipped)
+    epsilon = 1e-3 * np.std(t_residual)
+    t_residual_regularized = t_residual + epsilon   # Adding a small value to avoid division by zero
 
     # Step 3: Fit a model on the residuals to estimate the treatment effect
-    tau_model = RandomForestRegressor(n_estimators=100, random_state=42)
-    tau_model.fit(X, y_residual / (t_residual_clipped + 1e-10))  # Adding a small value to avoid division by zero
+    tau_model = Ridge(alpha=1.0)
+    tau_model.fit(X, y_residual / t_residual_regularized)
 
     return tau_model, y_model, t_model, y_residual,t_residual
 

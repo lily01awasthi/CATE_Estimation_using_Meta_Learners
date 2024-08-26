@@ -1,11 +1,10 @@
-import pandas as pd
 # Import the necessary functions from the scripts
 from models.Meta_Learners.s_Learner import s_fit, predict_outcomes, estimate_CATE
 from models.Meta_Learners.x_learner import x_fit, predict_outcomes_x, estimate_CATE_x
 from models.Meta_Learners.r_learner import r_fit, predict_outcomes_r, estimate_CATE_r
 from models.Meta_Learners.t_learner import t_fit, predict_outcomes_t, estimate_CATE_t
 from data import data_preprocessing
-import numpy as np
+import pandas as pd
 
 class TrainAndPredict:
     def __init__(self, data):
@@ -51,8 +50,7 @@ class TrainAndPredict:
         s_predictions = predict_outcomes(self.data[covariate_cols], s_model, treatment_col)
         s_cate = estimate_CATE(s_predictions)
         data_with_s_cate = self.data.copy()
-        data_with_s_cate['CATE']=s_cate
-
+        data_with_s_cate['CATE'] = s_cate
 
         # T-Learner
         t_model_treated, t_model_control = t_fit(self.data, treatment_col, outcome_col, covariate_cols)
@@ -69,7 +67,8 @@ class TrainAndPredict:
         data_with_x_cate['CATE'] = x_cate
 
         # R-Learner
-        r_tau_model, r_y_model, r_t_model, y_residual,t_residual = r_fit(self.data, treatment_col, outcome_col, covariate_cols)
+        r_tau_model, r_y_model, r_t_model, y_residual, t_residual = r_fit(self.data, treatment_col, outcome_col,
+                                                                          covariate_cols)
         r_predictions = predict_outcomes_r(self.data[covariate_cols], r_tau_model, r_y_model, r_t_model)
         r_cate = estimate_CATE_r(r_predictions)
         data_with_r_cate = self.data.copy()
@@ -79,11 +78,6 @@ class TrainAndPredict:
         t_arry = pd.DataFrame(t_residual)
         print(t_arry.describe())
         print(y_arry.describe())
-        # Save or print the CATE estimates
-        # print("S-Learner CATE:", data_with_s_cate)
-        # print("X-Learner CATE:", data_with_x_cate)
-        # print("R-Learner CATE:", data_with_r_cate)
-        # print("T-Learner CATE:", data_with_t_cate)
 
         return data_with_s_cate, data_with_t_cate, data_with_x_cate, data_with_r_cate
 
@@ -106,5 +100,3 @@ if __name__ == '__main__':
     t_estimates.to_csv(t_output_path, index=False)
     x_estimates.to_csv(x_output_path, index=False)
     r_estimates.to_csv(r_output_path, index=False)
-
-    # print(f"CATE estimates saved to: output_path")

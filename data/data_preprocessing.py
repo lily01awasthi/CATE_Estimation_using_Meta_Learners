@@ -24,13 +24,6 @@ def preprocess_data(path):
         'X5': 'TotalStudentPopulation'
     })
 
-    # Handle missing values (example: filling missing values with the mean)
-    # data.fillna(data.mean(), inplace=True)
-    #
-    # # Encode categorical variables (example: one-hot encoding)
-    # categorical_columns = ['StudentRaceEthnicity', 'StudentGender', 'SchoolUrbanicity']
-    # data = pd.get_dummies(data, columns=categorical_columns, drop_first=True)
-
     return data
 
 
