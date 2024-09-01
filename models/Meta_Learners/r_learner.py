@@ -1,7 +1,9 @@
 import pandas as pd
-from sklearn.linear_model import Lasso, Ridge
+from sklearn.linear_model import LassoCV, Ridge
 from sklearn.model_selection import train_test_split
 import numpy as np
+from sklearn.model_selection import cross_val_predict
+
 def r_fit(data, treatment_col, outcome_col, covariate_cols):
     """
     Train an R-learner model to estimate the Conditional Average Treatment Effect (CATE).
@@ -15,33 +17,42 @@ def r_fit(data, treatment_col, outcome_col, covariate_cols):
     Returns:
     - tau_model: trained model for estimating the treatment effect
     """
-    # Create the covariates matrix and the outcome vector
+    model = Ridge(alpha=10.0)
     X = data[covariate_cols]
     T = data[treatment_col]
     y = data[outcome_col]
 
-    # Step 1: Fit a model to predict the outcome using covariates
-    y_model = Lasso(alpha=0.1, random_state=42)
-    y_model.fit(X, y)
+    # Fit outcome model
+    y_model = cross_val_predict(model, X, y, cv=5)
 
-    # Step 2: Fit a model to predict the treatment using covariates
-    t_model = Lasso(alpha=0.1, random_state=42)
-    t_model.fit(X, T)
+    # Fit treatment model
+    t_model = cross_val_predict(model, X, T, cv=5)
 
-    # Compute residuals
-    y_residual = y - y_model.predict(X)
-    t_residual = T - t_model.predict(X)
+    # Calculate residuals
+    y_residual = y - y_model
+    t_residual = T - t_model
 
-    # t_residual_clipped = t_residual.clip(lower=0.01)
+    # Regularization of residuals
+    t_residual_clipped = np.clip(t_residual, a_min=0.001, a_max=None)
     y_residual = (y_residual - np.mean(y_residual)) / np.std(y_residual)
+    t_residual_clipped = (t_residual_clipped - np.mean(t_residual_clipped)) / np.std(t_residual_clipped)
 
-    # t_residual_clipped = (t_residual_clipped - np.mean(t_residual_clipped)) / np.std(t_residual_clipped)
+    # Add a small constant to prevent division by zero
     epsilon = 1e-3 * np.std(t_residual)
-    t_residual_regularized = t_residual + epsilon   # Adding a small value to avoid division by zero
+    t_residual_regularized = t_residual_clipped + epsilon
 
-    # Step 3: Fit a model on the residuals to estimate the treatment effect
-    tau_model = Ridge(alpha=1.0)
+    #     # Use RidgeCV or LassoCV for additional regularization in the final model
+    #     regularization = 'ridge'
+    #     tau_model = RidgeCV(alphas=[0.1, 1.0, 10.0])
+    regularization = 'lasso'
+    tau_model = Ridge(alpha=0.1)
+    # Fit the treatment effect model
+    division_result = y_residual / t_residual_regularized
+    print(f"division result : {division_result.describe()}")
+
     tau_model.fit(X, y_residual / t_residual_regularized)
+    print(f"tau model coefficient :{tau_model.coef_}")
+    # print(f"Best alpha chosen by cross-validation: {tau_model.alpha_}")
 
     return tau_model, y_model, t_model, y_residual,t_residual
 
@@ -59,8 +70,8 @@ def predict_outcomes_r(X, tau_model, y_model, t_model):
     - pd.Series with treatment effect estimates.
     """
     # Predict residuals
-    y_residual = y_model.predict(X)
-    t_residual = t_model.predict(X)
+    y_residual = y_model
+    t_residual = t_model
 
     # Predict treatment effect
     tau_pred = tau_model.predict(X)

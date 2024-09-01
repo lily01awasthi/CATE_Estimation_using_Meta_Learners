@@ -70,6 +70,8 @@ class TrainAndPredict:
         # R-Learner
         r_tau_model, r_y_model, r_t_model, y_residual, t_residual = r_fit(self.data, treatment_col, outcome_col,
                                                                           covariate_cols)
+        print(y_residual.describe())
+        print(t_residual.describe())
         r_predictions = predict_outcomes_r(self.data[covariate_cols], r_tau_model, r_y_model, r_t_model)
         r_cate = estimate_CATE_r(r_predictions)
         data_with_r_cate = self.data.copy()
