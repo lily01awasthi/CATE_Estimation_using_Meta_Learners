@@ -5,7 +5,8 @@ from models.Meta_Learners.r_learner import r_fit, predict_outcomes_r, estimate_C
 from models.Meta_Learners.t_learner import t_fit, predict_outcomes_t, estimate_CATE_t
 from data import data_preprocessing
 import pandas as pd
-
+import sqlite3
+print(sqlite3.__file__)
 
 class TrainAndPredict:
     def __init__(self, data):
@@ -87,17 +88,17 @@ class TrainAndPredict:
 
 # Example usage within the same script, if run as a standalone for testing:
 if __name__ == '__main__':
-    path = '../data/dataset.csv'  # Replace with the actual path to your dataset
+    path = 'data/dataset.csv'  # Replace with the actual path to your dataset
     processed_data = data_preprocessing.preprocess_data(path)  # Get the preprocessed data
     tp = TrainAndPredict(processed_data)
     s_estimates, t_estimates, x_estimates, r_estimates = tp.train_and_predict()
     # print(s_estimates, t_estimates, x_estimates, r_estimates)
 
     # Save the CATE estimates to a CSV file
-    s_output_path = '../results/s_predictions.csv'
-    t_output_path = '../results/t_predictions.csv'
-    x_output_path = '../results/x_predictions.csv'
-    r_output_path = '../results/r_predictions.csv'
+    s_output_path = 'results/s_predictions.csv'
+    t_output_path = 'results/t_predictions.csv'
+    x_output_path = 'results/x_predictions.csv'
+    r_output_path = 'results/r_predictions.csv'
 
     s_estimates.to_csv(s_output_path, index=False)
     t_estimates.to_csv(t_output_path, index=False)
