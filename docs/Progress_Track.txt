@@ -1,0 +1,27 @@
+
+
+TODO_next::::Continue working on following 
+2. Causal Inference: Estimating the Conditional Average Treatment Effect (CATE)
+Objective:
+To assess how different meta-learners (T-Learner, S-Learner, X-Learner, R-Learner) estimate the Conditional Average Treatment Effect (CATE) in this educational setting, where the treatment is binary (growth mindset intervention).
+
+Action Steps:
+Model Setup:
+
+Implement the different meta-learners (e.g., T-Learner, S-Learner, X-Learner, R-Learner).
+Use student achievement (Y) as the outcome and treatment (Z) as the binary intervention variable.
+Feature Selection:
+
+Based on your correlation matrix, select relevant features that might moderate the effect of the treatment. Key variables include:
+Fixed Mindset (X1): Schools with different mindset levels might respond differently to the intervention.
+School Achievement Level (X2): Higher or lower-achieving schools might show varied responses.
+Minority Composition (X3) and Poverty Concentration (X4): Demographic factors that could moderate the intervention effect.
+Model Evaluation:
+
+Compare the performance of each meta-learner in terms of estimating the treatment effect. Metrics to evaluate include:
+Mean Squared Error (MSE)
+Bias-Variance Tradeoff
+Interpretability of results.
+Cross-validation:
+
+Perform cross-validation to ensure the robustness of your CATE estimates across different subsets of the data.
