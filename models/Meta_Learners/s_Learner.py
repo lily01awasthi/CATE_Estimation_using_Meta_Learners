@@ -19,7 +19,7 @@ Y^(0)=f(Xi,0), Y^(1)=f(Xi,1). CATE for for individual i is then computed as the 
 """
 
 import pandas as pd
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.neural_network import MLPRegressor  # Neural Network Model
 
 """
 The S-learner uses a single model to estimate the treatment effect by including the treatment as a feature in the model.
@@ -48,7 +48,14 @@ def s_fit(data, treatment_col, outcome_col, covariate_cols):
     Y = data[outcome_col]
 
     # Train a model on the combined data
-    model = GradientBoostingRegressor(n_estimators=200, random_state=42,learning_rate= 0.1, max_depth= 3 )
+    # Train the Neural Network model (MLPRegressor)
+    model = MLPRegressor(
+        activation='tanh',
+        hidden_layer_sizes=(50,),
+        learning_rate_init=0.001,
+        solver='adam',
+        random_state=42
+    )   
     model.fit(X, Y)
 
     return model

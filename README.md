@@ -1,6 +1,6 @@
 # CATE_Estimation_using_Meta_Learners
 Applying meta-learner models (T, S, X, R-learners) to estimate CATE in educational interventions. Project aims to analyze treatment effects using machine learning models.
-# This Project will focus on following Research Questions
+# This Project is focused on following Research Questions
 ## Causal Inference with Different Meta-Learners:
 * Question: "How do different meta-learners (T-Learner, S-Learner, X-Learner, R-Learner) compare in estimating the Conditional Average Treatment Effect (CATE) in educational settings with binary treatment?"
 * Context: Given the binary nature of the treatment, a thorough comparison of meta-learners could reveal which method provides the most accurate or interpretable results in this context.

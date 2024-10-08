@@ -3,7 +3,7 @@ from models.Meta_Learners.s_Learner import s_fit, predict_outcomes, estimate_CAT
 from models.Meta_Learners.x_learner import x_fit, predict_outcomes_x, estimate_CATE_x
 from models.Meta_Learners.r_learner import r_fit, predict_outcomes_r, estimate_CATE_r
 from models.Meta_Learners.t_learner import t_fit, predict_outcomes_t, estimate_CATE_t
-from data import data_preprocessing
+from data.data_preprocessing import preprocessor,load_data,treatment_outcome_and_control,split_train_test_data
 import pandas as pd
 import sqlite3
 print(sqlite3.__file__)
