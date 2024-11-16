@@ -1,0 +1,8 @@
+model,learner,best_rmse,best_emse,best_params
+RandomForest,T-Learner,0.5558048548986664,0.7763682153923781,"{'control_params': {'max_depth': 10, 'max_features': 'log2', 'min_samples_split': 10, 'n_estimators': 500}, 'treated_params': {'max_depth': 10, 'max_features': 'log2', 'min_samples_split': 10, 'n_estimators': 200}}"
+GradientBoosting,T-Learner,0.566340121623449,0.7639995962849684,"{'control_params': {'learning_rate': 0.05, 'max_depth': 3, 'min_samples_split': 5, 'n_estimators': 200, 'subsample': 0.8}, 'treated_params': {'learning_rate': 0.1, 'max_depth': 3, 'min_samples_split': 10, 'n_estimators': 100, 'subsample': 0.8}}"
+NeuralNetwork,T-Learner,0.5857387344703907,0.8097128744494135,"{'control_params': {'activation': 'tanh', 'hidden_layer_sizes': (100,), 'learning_rate_init': 0.001, 'solver': 'adam'}, 'treated_params': {'activation': 'tanh', 'hidden_layer_sizes': (100,), 'learning_rate_init': 0.001, 'solver': 'adam'}}"
+Ridge,T-Learner,0.5990685742040568,0.7415405866931273,"{'control_params': {'alpha': 10.0}, 'treated_params': {'alpha': 10.0}}"
+SVR,T-Learner,0.5738955240577935,0.7581208656989391,"{'control_params': {'C': 0.1, 'epsilon': 0.1, 'kernel': 'rbf'}, 'treated_params': {'C': 1.0, 'epsilon': 0.5, 'kernel': 'rbf'}}"
+AdaBoost,T-Learner,0.596739244614477,0.757837476296852,"{'control_params': {'learning_rate': 0.1, 'n_estimators': 200}, 'treated_params': {'learning_rate': 0.5, 'n_estimators': 50}}"
+ExtraTrees,T-Learner,0.5460459594000231,0.8037132921328803,"{'control_params': {'max_depth': 10, 'min_samples_split': 10, 'n_estimators': 500}, 'treated_params': {'max_depth': 10, 'min_samples_split': 10, 'n_estimators': 100}}"

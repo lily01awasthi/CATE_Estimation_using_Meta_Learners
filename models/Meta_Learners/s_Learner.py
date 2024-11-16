@@ -61,7 +61,7 @@ def s_fit(data, treatment_col, outcome_col, covariate_cols):
     return model
 
 
-def predict_outcomes(X, model, treatment_col):
+def predict_outcomes_s(X, model, treatment_col):
     """
     Predict potential outcomes for both treatment and control groups.
 
@@ -84,7 +84,7 @@ def predict_outcomes(X, model, treatment_col):
     return pd.DataFrame({'pred_0': pred_0, 'pred_1': pred_1})
 
 
-def estimate_CATE(df):
+def estimate_CATE_s(df):
     """
     Estimate the Conditional Average Treatment Effect (CATE).
 

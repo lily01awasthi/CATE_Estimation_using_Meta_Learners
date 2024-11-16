@@ -1,0 +1,8 @@
+model,learner,best_rmse,best_emse,best_params
+RandomForest,S-Learner,0.5605224030657091,0.5378087509606322,"{'max_depth': 10, 'max_features': 'sqrt', 'min_samples_split': 10, 'n_estimators': 500}"
+GradientBoosting,S-Learner,0.574986929497117,0.5634127984594708,"{'learning_rate': 0.05, 'max_depth': 3, 'min_samples_split': 10, 'n_estimators': 200, 'subsample': 0.8}"
+NeuralNetwork,S-Learner,0.5749036326367367,0.5420481995792557,"{'activation': 'tanh', 'hidden_layer_sizes': (100,), 'learning_rate_init': 0.001, 'solver': 'adam'}"
+Ridge,S-Learner,0.6006775991541508,0.6005233399586316,{'alpha': 10.0}
+SVR,S-Learner,0.5825907660895441,0.5769971458869769,"{'C': 0.1, 'epsilon': 0.2, 'kernel': 'rbf'}"
+AdaBoost,S-Learner,0.6023926017697051,0.6011551545566496,"{'learning_rate': 0.5, 'n_estimators': 100}"
+ExtraTrees,S-Learner,0.5565369226873601,0.532302720726365,"{'max_depth': 10, 'min_samples_split': 10, 'n_estimators': 200}"
