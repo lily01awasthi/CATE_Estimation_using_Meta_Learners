@@ -1,0 +1,8 @@
+model,learner,best_rmse,best_emse,best_params
+RandomForest,R-Learner,0.6394842721436448,0.6109029944418976,"{'max_depth': 10, 'max_features': None, 'min_samples_split': 10, 'n_estimators': 500}"
+GradientBoosting,R-Learner,0.639697280347054,0.6261622731135918,"{'learning_rate': 0.01, 'max_depth': 3, 'min_samples_split': 10, 'n_estimators': 200, 'subsample': 0.8}"
+NeuralNetwork,R-Learner,0.6380850049892829,0.6392579928662382,"{'activation': 'relu', 'hidden_layer_sizes': (50,), 'learning_rate_init': 0.01, 'solver': 'lbfgs'}"
+Ridge,R-Learner,0.6372973463915333,0.636264732099916,{'alpha': 0.01}
+SVR,R-Learner,0.6417678948991097,0.632239879889381,"{'C': 0.1, 'epsilon': 0.5, 'kernel': 'linear'}"
+AdaBoost,R-Learner,0.6327820577985432,0.6335622817479901,"{'learning_rate': 0.01, 'n_estimators': 100}"
+ExtraTrees,R-Learner,0.6491880337342583,0.6197300990080037,"{'max_depth': 10, 'min_samples_split': 10, 'n_estimators': 500}"
