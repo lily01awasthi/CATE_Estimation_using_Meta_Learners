@@ -73,6 +73,7 @@ def predict_outcomes_s(X, model, treatment_col):
     Returns:
     - pd.DataFrame with columns 'pred_0' and 'pred_1' for control and treatment predictions.
     """
+    
     X_control = X.copy()
     X_control[treatment_col] = 0
     pred_0 = model.predict(X_control)
@@ -80,6 +81,9 @@ def predict_outcomes_s(X, model, treatment_col):
     X_treatment = X.copy()
     X_treatment[treatment_col] = 1
     pred_1 = model.predict(X_treatment)
+
+
+
 
     return pd.DataFrame({'pred_0': pred_0, 'pred_1': pred_1})
 
