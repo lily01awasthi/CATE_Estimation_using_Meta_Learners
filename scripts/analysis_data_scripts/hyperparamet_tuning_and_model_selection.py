@@ -255,11 +255,11 @@ if __name__ == '__main__':
     results_df = apply_grid_search(param_grid, X_train, y_train, treatment_train)
     
     # Save and print results
-    # results_df.to_csv('grid_search_results.csv', index=False) # all_meta_learners 
-    results_df.to_csv('grid_search_results_S_learner_test.csv', index=False) # S_learner
-    # results_df.to_csv('grid_search_results_T_learner.csv', index=False) # T_learner
-    # results_df.to_csv('grid_search_results_X_learner.csv', index=False) # X_learner
-    # results_df.to_csv('grid_search_results_R_learner.csv', index=False) # R_learner
+    # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results.csv', index=False) # all_meta_learners 
+    results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_S_learner_test.csv', index=False) # S_learner
+    # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_T_learner.csv', index=False) # T_learner
+    # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_X_learner.csv', index=False) # X_learner
+    # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_R_learner.csv', index=False) # R_learner
 
 
     print(results_df)
