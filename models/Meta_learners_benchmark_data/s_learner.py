@@ -1,30 +1,30 @@
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.metrics import mean_squared_error
-import numpy as np
+from models.Meta_learners_benchmark_data.meta_learner_models import S_learner_model
 
-def s_learner(X_train, X_test, y_train, y_test, treatment_col="Treatment"):
-    
-    # Initialize and train S-Learner model
-    s_learner = GradientBoostingRegressor(random_state=42)
-    s_learner.fit(X_train, y_train)
+def s_learner(X_train, X_test, y_train, treatment_col="Treatment"):
+    # Ensure 'Treatment' is a column in X_train and X_test
+    if treatment_col not in X_train.columns:
+        raise ValueError(f"The column '{treatment_col}' must be present in X_train and X_test.")
+
+    model = S_learner_model
+    model.fit(X_train, y_train)
 
     # Step 3: Make predictions for treated and control groups
-    # Predictions for treated group
+    # Create copies of X_test to modify Treatment column
     X_test_treated = X_test.copy()
-    X_test_treated[treatment_col] = 1
-    treated_outcomes = s_learner.predict(X_test_treated)
+    X_test_treated[treatment_col] = 1  # Set Treatment = 1 for treated group
 
-    # Predictions for control group
     X_test_control = X_test.copy()
-    X_test_control[treatment_col] = 0
-    control_outcomes = s_learner.predict(X_test_control)
+    X_test_control[treatment_col] = 0  # Set Treatment = 0 for control group
+
+    # Ensure consistent feature order
+    X_test_treated = X_test_treated[X_train.columns]
+    X_test_control = X_test_control[X_train.columns]
+
+    # Predictions for treated and control groups
+    treated_outcomes = model.predict(X_test_treated)
+    control_outcomes = model.predict(X_test_control)
 
     # Estimate CATE
     s_learner_cate = treated_outcomes - control_outcomes
 
-    # Step 4: Evaluate using Mean Squared Error (MSE), Bias, and Variance
-    mse = mean_squared_error(y_test, s_learner_cate)
-    bias = np.mean(s_learner_cate - y_test)
-    variance = np.var(s_learner_cate)
-
-    return s_learner_cate, mse, bias, variance
+    return s_learner_cate

@@ -1,14 +1,8 @@
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.metrics import mean_squared_error
+from models.Meta_learners_benchmark_data.meta_learner_models import T_learner_model
 
-def t_learner(X_train, X_test, y_train, y_test):
+def t_learner(X_train, X_test, y_train):
 
-    # Initialize T-Learner models 
-    treated_model = GradientBoostingRegressor(random_state=42)
-    control_model = GradientBoostingRegressor(random_state=42)
+    control_model, treated_model = T_learner_model
 
     # Train T-Learner models for treated and control groups 
     treated_model.fit(X_train[X_train["Treatment"] == 1].drop(columns=["Treatment"]), 
@@ -23,10 +17,5 @@ def t_learner(X_train, X_test, y_train, y_test):
     # Estimate CATE 
     t_learner_cate = treated_outcomes - control_outcomes
 
-    # Step 4: Evaluate using Mean Squared Error (MSE), Bias, and Variance 
-    t_learner_mse = mean_squared_error(y_test, t_learner_cate)
-    t_learner_bias = np.mean(t_learner_cate - y_test)
-    t_learner_variance = np.var(t_learner_cate)
-
-    return t_learner_cate, t_learner_mse, t_learner_bias, t_learner_variance
+    return t_learner_cate
 

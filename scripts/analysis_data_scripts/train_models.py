@@ -1,7 +1,6 @@
 
 import sys
 import os
-    
 import pandas as pd
 # Import the necessary functions from the scripts
 from models.Meta_Learners.s_Learner import s_fit, predict_outcomes_s, estimate_CATE_s
@@ -9,12 +8,11 @@ from models.Meta_Learners.x_learner import x_fit, predict_outcomes_x, estimate_C
 from models.Meta_Learners.r_learner import r_fit, predict_outcomes_r, estimate_CATE_r
 from models.Meta_Learners.t_learner import t_fit, predict_outcomes_t, estimate_CATE_t
 from scripts.analysis_data_scripts.data_preprocessor import load_data, preprocessor
-from sklearn.metrics import mean_squared_error
-import numpy as np
-
+from scripts.analysis_data_scripts.evaluate_models import evaluate_meta_learner,bootstrap_emse_no_groundtruth
+from models.Meta_Learners.meta_learner_models import S_learner_model, T_learner_model, X_learner_model, R_learner_model
 
 class TrainAndPredict:
-    def __init__(self, X_train, y_train, treatment_train, X_test):
+    def __init__(self, X_train, y_train, treatment_train, X_test,treatment_test):
         """
         Initialize the TrainAndPredict class with preprocessed data.
 
@@ -28,6 +26,7 @@ class TrainAndPredict:
         self.y_train = y_train
         self.treatment_train = treatment_train
         self.X_test = X_test
+        self.treatment_test = treatment_test
 
     def extract_features(self):
         """
@@ -42,6 +41,30 @@ class TrainAndPredict:
         outcome_col = 'SchoolAchievementLevel'
         covariate_cols = list(self.X_train.columns)
         return treatment_col, outcome_col, covariate_cols
+    
+    def get_cate_estimates(self,s_predictions, t_predictions, x_predictions, r_predictions):
+        
+        s_cate = estimate_CATE_s(s_predictions)
+        data_with_s_cate = self.X_test.copy()
+        data_with_s_cate['treatment'] = self.treatment_test  
+        data_with_s_cate['s_CATE'] = s_cate
+
+        t_cate = estimate_CATE_t(t_predictions)
+        data_with_t_cate = self.X_test.copy()
+        data_with_t_cate['treatment'] = self.treatment_test
+        data_with_t_cate['t_CATE'] = t_cate
+
+        x_cate = estimate_CATE_x(x_predictions)
+        data_with_x_cate = self.X_test.copy()
+        data_with_x_cate['treatment'] = self.treatment_test
+        data_with_x_cate['x_CATE'] = x_cate
+
+        r_cate = estimate_CATE_r(r_predictions)
+        data_with_r_cate = self.X_test.copy()
+        data_with_r_cate['treatment'] = self.treatment_test
+        data_with_r_cate['r_CATE'] = r_cate
+
+        return data_with_s_cate, data_with_t_cate, data_with_x_cate, data_with_r_cate
 
     def train_and_predict(self):
         """
@@ -56,44 +79,28 @@ class TrainAndPredict:
         s_model = s_fit(pd.concat([self.X_train, pd.Series(self.treatment_train, name=treatment_col)], axis=1),
                         treatment_col, outcome_col, covariate_cols)
         s_predictions = predict_outcomes_s(self.X_test, s_model, treatment_col)
-        s_cate = estimate_CATE_s(s_predictions)
-        data_with_s_cate = self.X_test.copy()
-        data_with_s_cate['s_CATE'] = s_cate
+        print(f"s_predictions:{s_predictions}")
 
         # T-Learner
         t_model_treated, t_model_control = t_fit(pd.concat([self.X_train, pd.Series(self.treatment_train, name=treatment_col)], axis=1),
                                                  treatment_col, outcome_col, covariate_cols)
         t_predictions = predict_outcomes_t(self.X_test, t_model_treated, t_model_control)
-        t_cate = estimate_CATE_t(t_predictions)
-        data_with_t_cate = self.X_test.copy()
-        data_with_t_cate['t_CATE'] = t_cate
+        print(f"t_predictions:{t_predictions}")
 
         # X-Learner
-        x_model_treated, x_model_control = x_fit(pd.concat([self.X_train, pd.Series(self.treatment_train, name=treatment_col)], axis=1),
+        x_model_treated, x_model_control, x_model_cate = x_fit(pd.concat([self.X_train, pd.Series(self.treatment_train, name=treatment_col)], axis=1),
                                                  treatment_col, outcome_col, covariate_cols)
-        x_predictions = predict_outcomes_x(self.X_test, x_model_treated, x_model_control)
-        x_cate = estimate_CATE_x(x_predictions)
-        data_with_x_cate = self.X_test.copy()
-        data_with_x_cate['x_CATE'] = x_cate
+        x_predictions = predict_outcomes_x(self.X_test, x_model_treated, x_model_control,x_model_cate)
+        print(f"x_predictions:{x_predictions}")
 
         # R-Learner
         r_tau_model = r_fit(pd.concat([self.X_train, pd.Series(self.treatment_train, name=treatment_col)], axis=1),
                             treatment_col, outcome_col, covariate_cols)
         r_predictions = predict_outcomes_r(self.X_test, r_tau_model)
-        r_cate = estimate_CATE_r(r_predictions)
-        data_with_r_cate = self.X_test.copy()
-        data_with_r_cate['r_CATE'] = r_cate
+        print(f"r_predictions:{r_predictions}")
 
-        # Print CATE estimates for each meta-learner
-        print("S-Learner CATE:", data_with_s_cate.head())
-        print("T-Learner CATE:", data_with_t_cate.head())
-        print("X-Learner CATE:", data_with_x_cate.head())
-        print("R-Learner CATE:", data_with_r_cate.head())
 
-        return data_with_s_cate, data_with_t_cate, data_with_x_cate, data_with_r_cate
-
-def calculate_rmse(true_values, predicted_values):
-    return np.sqrt(mean_squared_error(true_values, predicted_values))
+        return s_predictions, t_predictions, x_predictions, r_predictions
 
 
 # Example usage
@@ -110,8 +117,9 @@ if __name__ == '__main__':
     print("Preprocessing done!")
 
     # Instantiate TrainAndPredict class with preprocessed data
-    train_predictor = TrainAndPredict(X_train, y_train, treatment_train, X_test)
-    s_estimates, t_estimates, x_estimates, r_estimates = train_predictor.train_and_predict()
+    train_predictor = TrainAndPredict(X_train, y_train, treatment_train, X_test,treatment_test)
+    s_predictions, t_predictions, x_predictions, r_predictions = train_predictor.train_and_predict()
+    s_estimates, t_estimates, x_estimates, r_estimates = train_predictor.get_cate_estimates(s_predictions, t_predictions, x_predictions, r_predictions)
 
     # Save the CATE estimates to a CSV file
     s_output_path = 'results/analysis_data_results/test_data/s_predictions.csv'
@@ -129,18 +137,32 @@ if __name__ == '__main__':
     # Extract true outcomes for RMSE calculation
     true_outcomes = y_test
 
+    results = {}
+
     # Calculate RMSE for S-Learner
-    s_rmse = calculate_rmse(true_outcomes, s_estimates['s_CATE'])
-    print("S-Learner RMSE:", s_rmse)
+    s_metrics = evaluate_meta_learner(s_predictions, y_test, treatment_test, 'S-Learner')
+    print("S-Learner evaluation metrics:", s_metrics)
 
     # Calculate RMSE for T-Learner
-    t_rmse = calculate_rmse(true_outcomes, t_estimates['t_CATE'])
-    print("T-Learner RMSE:", t_rmse)
+    t_metrics = evaluate_meta_learner(t_predictions, y_test, treatment_test, 'T-Learner')
+    print("T-Learner evaluation metrics:", t_metrics)
 
     # Calculate RMSE for X-Learner
-    x_rmse = calculate_rmse(true_outcomes, x_estimates['x_CATE'])
-    print("X-Learner RMSE:", x_rmse)
+    x_metrics = evaluate_meta_learner(x_predictions, y_test, treatment_test, 'X-Learner')
+    print("X-Learner evaluation metrics:", x_metrics)
 
-    # Calculate RMSE for R-Learner
-    r_rmse = calculate_rmse(true_outcomes, r_estimates['r_CATE'])
-    print("R-Learner RMSE:", r_rmse)
+   # calculate varianle of eastimated cate given by each meta learner
+    s_emse = bootstrap_emse_no_groundtruth(X_train, treatment_train, S_learner_model, 'S-Learner')
+    print(f"s_emse:{s_emse}")
+
+    t_emse = bootstrap_emse_no_groundtruth(X_train, treatment_train, T_learner_model, 'T-Learner')
+    print(f"t_emse:{t_emse}")
+
+    x_emse = bootstrap_emse_no_groundtruth(X_train, treatment_train, X_learner_model, 'X-Learner')
+    print(f"x_emse:{x_emse}")
+
+    r_emse = bootstrap_emse_no_groundtruth(X_train, treatment_train, R_learner_model, 'R-Learner')
+    print(f"r_emse:{r_emse}")
+
+    
+

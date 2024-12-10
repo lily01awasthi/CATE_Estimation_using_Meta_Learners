@@ -1,21 +1,9 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import Ridge
-
+from models.Meta_Learners.meta_learner_models import X_learner_model
+from sklearn.ensemble import AdaBoostRegressor
 
 def x_fit(data, treatment_col, outcome_col, covariate_cols):
-    """
-    Train an X-learner model to estimate the Conditional Average Treatment Effect (CATE).
-
-    Parameters:
-    - data: DataFrame, the preprocessed dataset
-    - treatment_col: str, name of the treatment column
-    - outcome_col: str, name of the outcome column
-    - covariate_cols: list of str, names of the covariate columns
-
-    Returns:
-    - cate_estimates: DataFrame, containing the CATE estimates for each instance
-    """
+    
     # Split the data into treatment and control groups
     treated_data = data[data[treatment_col] == 1]
     control_data = data[data[treatment_col] == 0]
@@ -26,42 +14,43 @@ def x_fit(data, treatment_col, outcome_col, covariate_cols):
     X_control = control_data[covariate_cols]
     y_control = control_data[outcome_col]
 
+    X_learner_model_control,X_learner_model_treated = X_learner_model
+
     # Train separate models on the treated and control groups
-    model_treated = Ridge(alpha=10.0, random_state=42)
-    model_control = Ridge(alpha=10.0, random_state=42)
+    model_treated = X_learner_model_treated
+    model_control = X_learner_model_control
+
 
     model_treated.fit(X_treated, y_treated)
     model_control.fit(X_control, y_control)
 
-    return model_treated, model_control
+    # Estimate pseudo outcomes for CATE model training
+    tau_control = y_control - model_treated.predict(X_control)
+    tau_treated = model_control.predict(X_treated) - y_treated
 
+    # Combine pseudo outcomes for final CATE model training
+    X_combined = pd.concat([X_control, X_treated])
+    tau_combined = pd.concat([pd.Series(tau_control, index=control_data.index),
+                              pd.Series(tau_treated, index=treated_data.index)])
 
-def predict_outcomes_x(X, model_treated, model_control):
-    """
-    Predict potential outcomes for both treatment and control groups.
+    # Train CATE model
+    cate_model = AdaBoostRegressor(learning_rate=0.01,n_estimators=50,random_state=42)
+    cate_model.fit(X_combined, tau_combined)
 
-    Parameters:
-    - X: pd.DataFrame, feature matrix excluding the treatment variable
-    - model_treated: trained model for treated data
-    - model_control: trained model for control data
+    return model_treated, model_control, cate_model
 
-    Returns:
-    - pd.DataFrame with columns 'pred_treated' and 'pred_control'.
-    """
+def predict_outcomes_x(X, model_treated, model_control, cate_model):
+    
     pred_treated = model_treated.predict(X)
     pred_control = model_control.predict(X)
+    cate_estimates = cate_model.predict(X)
 
-    return pd.DataFrame({'pred_treated': pred_treated, 'pred_control': pred_control})
-
+    return pd.DataFrame({
+        'pred_treated': pred_treated,
+        'pred_control': pred_control,
+        'cate_estimates': cate_estimates
+    })
 
 def estimate_CATE_x(df):
-    """
-    Estimate the Conditional Average Treatment Effect (CATE) using X-learner.
+    return df['cate_estimates']
 
-    Parameters:
-    - df: pd.DataFrame, dataframe containing predictions for treated and control groups
-
-    Returns:
-    - pd.Series with CATE estimates.
-    """
-    return df['pred_treated'] - df['pred_control']

@@ -1,11 +1,10 @@
 import numpy as np
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.linear_model import Ridge, LogisticRegression
-from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import cross_val_predict
-from sklearn.metrics import mean_squared_error
+from models.Meta_learners_benchmark_data.meta_learner_models import R_learner_model_k, R_learner_model_p
 
-def r_learner(X_train, X_test, y_train, y_test):
+def r_learner(X_train, X_test, y_train, hypothesis):
     # Standardize the features 
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train.drop(columns=["Treatment"]))
@@ -19,7 +18,10 @@ def r_learner(X_train, X_test, y_train, y_test):
     e_hat = cross_val_predict(propensity_model, X_train_scaled, X_train["Treatment"], cv=5, method="predict_proba")[:, 1]
 
     # Step 5: Train outcome model and calculate residuals 
-    outcome_model = GradientBoostingRegressor(random_state=42)
+    if hypothesis == "k":
+        outcome_model = R_learner_model_k
+    else:
+        outcome_model = R_learner_model_p
     outcome_model.fit(X_train_scaled, y_train)
 
     y_hat = cross_val_predict(outcome_model, X_train_scaled, y_train, cv=5)
@@ -61,10 +63,5 @@ def r_learner(X_train, X_test, y_train, y_test):
     # Step 8: Predict treatment effects on test set 
     r_learner_cate = r_learner_model.predict(X_test_scaled)
 
-    # Step 9: Evaluate R-Learner for both hypotheses using Mean Squared Error (MSE)
-    r_learner_mse = mean_squared_error(y_test, r_learner_cate)
-    r_learner_bias = np.mean(r_learner_cate - y_test)
-    r_learner_variance = np.var(r_learner_cate)
-
-    return r_learner_cate, r_learner_mse, r_learner_bias, r_learner_variance
+    return r_learner_cate
 

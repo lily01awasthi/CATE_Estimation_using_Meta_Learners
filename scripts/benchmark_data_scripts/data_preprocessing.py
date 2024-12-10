@@ -67,13 +67,24 @@ def preprocess_data(training_data, ground_truth):
 
     return meta_learner_data
 
-def split_per_hypothesis(x, hypothesis):
-    # Split the data into training and test sets for both hypotheses
+def split_per_hypothesis_for_test(x, hypothesis):
+    """
+    Split the data into training and test sets for both hypotheses.
+    This function retains the Treatment column separately.
+    """
     X_train, X_test, y_train, y_test = train_test_split(x, hypothesis, test_size=0.3, random_state=42)
-    return X_train, X_test, y_train, y_test
+    treatment_train = X_train["Treatment"].values  # Extract Treatment column for training
+    treatment_test = X_test["Treatment"].values  # Extract Treatment column for testing
 
-def split_data(meta_learner_data):
 
+    return X_train, X_test, y_train, y_test, treatment_train, treatment_test
+
+
+def split_data_for_test(meta_learner_data):
+    """
+    Split the meta-learner data into training and test sets for both hypotheses.
+    Returns features, targets, and treatment assignments separately.
+    """
     # Define features and target
     X = meta_learner_data.drop(columns=["TrueCATE_p", "TrueCATE_k"])
 
@@ -82,8 +93,31 @@ def split_data(meta_learner_data):
     y_k_hypothesis_2 = meta_learner_data["TrueCATE_k"]  # Ground truth for Hypothesis 2 (ate_k_1__)
 
     # Split the data into training and test sets for both hypotheses
-    X_train_p, X_test_p, y_train_p, y_test_p = split_per_hypothesis(X, y_p_hypothesis_1)
-    X_train_k, X_test_k, y_train_k, y_test_k = split_per_hypothesis(X, y_k_hypothesis_2)
+    X_train_p, X_test_p, y_train_p, y_test_p, treatment_train_p, treatment_test_p = split_per_hypothesis_for_test(X, y_p_hypothesis_1)
+    X_train_k, X_test_k, y_train_k, y_test_k, treatment_train_k, treatment_test_k = split_per_hypothesis_for_test(X, y_k_hypothesis_2)
+
+    return (
+        X_train_p, X_test_p, y_train_p, y_test_p, treatment_train_p, treatment_test_p,
+        X_train_k, X_test_k, y_train_k, y_test_k, treatment_train_k, treatment_test_k
+    )
+
+def split_per_hypothesis(x, hypothesis):
+    # Split the data into training and test sets for both hypotheses
+    X_train, X_test, y_train, y_test = train_test_split(x, hypothesis, test_size=0.3, random_state=42)
+    return X_train, X_test, y_train, y_test
+
+def split_data(meta_learner_data):
+
+    # Define features and target
+    # X = meta_learner_data.drop(columns=["TrueCATE_p", "TrueCATE_k"])
+
+    # Step 1: Create separate targets for both hypotheses
+    y_p_hypothesis_1 = meta_learner_data["TrueCATE_p"]  # Ground truth for Hypothesis 1 (ate_p_1__)
+    y_k_hypothesis_2 = meta_learner_data["TrueCATE_k"]  # Ground truth for Hypothesis 2 (ate_k_1__)
+
+    # Split the data into training and test sets for both hypotheses
+    X_train_p, X_test_p, y_train_p, y_test_p = split_per_hypothesis(meta_learner_data, y_p_hypothesis_1)
+    X_train_k, X_test_k, y_train_k, y_test_k = split_per_hypothesis(meta_learner_data, y_k_hypothesis_2)
 
     return X_train_p, X_test_p, y_train_p, y_test_p, X_train_k, X_test_k, y_train_k, y_test_k    
 
@@ -92,7 +126,8 @@ if __name__ == '__main__':
     # Load  data
     training_data, ground_truth = load_data(path="data/benchmark_data")
     meta_learner_data = preprocess_data(training_data, ground_truth)
-    X_train_p, X_test_p, y_train_p, y_test_p, X_train_k, X_test_k, y_train_k, y_test_k = split_data(meta_learner_data)
+    (X_train_p, X_test_p, y_train_p, y_test_p, treatment_train_p, treatment_test_p,X_train_k, 
+     X_test_k, y_train_k, y_test_k, treatment_train_k, treatment_test_k) = split_data_for_test(meta_learner_data)
 
     # Evaluate S-Learner for Hypothesis 1 (ate_p_1__)
     s_learner_cate_p, s_learner_mse_p, s_learner_bias_p, s_learner_variance_p = s_learner(X_train_p, X_test_p, y_train_p, y_test_p)

@@ -1,19 +1,15 @@
 from sklearn.linear_model import Ridge, LogisticRegression
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
-import numpy as np
+from models.Meta_learners_benchmark_data.meta_learner_models import X_learner_model
 
-def x_learner(X_train, X_test, y_train, y_test):
+def x_learner(X_train, X_test, y_train):
     
     # Step 3: Standardize the features
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train.drop(columns=["Treatment"]))
     X_test_scaled = scaler.transform(X_test.drop(columns=["Treatment"]))
 
-    # Train models for treated and control groups 
-    treated_model = GradientBoostingRegressor(random_state=42)
-    control_model = GradientBoostingRegressor(random_state=42)
+    control_model, treated_model = X_learner_model
 
     treated_model.fit(X_train_scaled[X_train["Treatment"] == 1], y_train[X_train["Treatment"] == 1])
     control_model.fit(X_train_scaled[X_train["Treatment"] == 0], y_train[X_train["Treatment"] == 0])
@@ -44,10 +40,5 @@ def x_learner(X_train, X_test, y_train, y_test):
     # Combine refined effects 
     x_learner_cate = propensity_scores * tau_treated_refined + (1 - propensity_scores) * tau_control_refined
 
-    # Evaluate 
-    x_learner_mse = mean_squared_error(y_test, x_learner_cate)
-    x_learner_bias = np.mean(x_learner_cate - y_test)
-    x_learner_variance = np.var(x_learner_cate)
-
-    return x_learner_cate, x_learner_mse, x_learner_bias, x_learner_variance
+    return x_learner_cate
 

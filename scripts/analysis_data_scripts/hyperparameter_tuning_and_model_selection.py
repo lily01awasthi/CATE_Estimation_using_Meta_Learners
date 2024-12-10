@@ -1,14 +1,12 @@
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, ExtraTreesRegressor, AdaBoostRegressor
 from sklearn.neural_network import MLPRegressor
-from sklearn.linear_model import Ridge, Lasso
+from sklearn.linear_model import Ridge
 from sklearn.svm import SVR
-from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.model_selection import GridSearchCV
 import numpy as np
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from sklearn.utils import resample
 import pandas as pd
 from scripts.analysis_data_scripts.data_preprocessor import preprocessor, load_data
-from scripts.analysis_data_scripts.evaluate_models import compute_rmse, bootstrap_emse
+from scripts.analysis_data_scripts.evaluate_models import compute_rmse, bootstrap_emse_no_groundtruth
 import time
 
 
@@ -23,54 +21,46 @@ def get_param_grid():
                 'max_features': ['sqrt', 'log2', None]  # Number of features to consider when looking for the best split
             }
         },
-        # 'GradientBoosting': {
-        #     'model': GradientBoostingRegressor(),
-        #     'params': {
-        #         'n_estimators': [100, 200, 500],  # Number of boosting stages
-        #         'learning_rate': [0.01, 0.05, 0.1],  # Step size shrinkage used in each boosting step
-        #         'max_depth': [3, 5, 10],  # Maximum depth of individual estimators
-        #         'min_samples_split': [2, 5, 10],  # Minimum number of samples required to split a node
-        #         'subsample': [0.8, 1.0]  # Fraction of samples used for fitting the individual estimators
-        #     }
-        # },
-        # 'NeuralNetwork': {
-        #     'model': MLPRegressor(max_iter=1000),  # Neural network regressor
-        #     'params': {
-        #         'hidden_layer_sizes': [(50,), (100,), (100, 100)],  # Size of the hidden layers
-        #         'activation': ['relu', 'tanh'],  # Activation functions
-        #         'solver': ['adam', 'lbfgs'],  # Solver for weight optimization
-        #         'learning_rate_init': [0.001, 0.01]  # Initial learning rate
-        #     }
-        # },
-        # 'Ridge': {
-        #     'model': Ridge(),
-        #     'params': {
-        #         'alpha': [0.01, 0.1, 1.0, 10.0, 100.0]  # Regularization strength
-        #     }
-        # },
-        # 'SVR': {
-        #     'model': SVR(),
-        #     'params': {
-        #         'kernel': ['linear', 'rbf'],  # Type of kernel
-        #         'C': [0.1, 1.0, 10.0],  # Regularization parameter
-        #         'epsilon': [0.1, 0.2, 0.5]  # Epsilon in the epsilon-SVR model
-        #     }
-        # },
-        # 'AdaBoost': {
-        #     'model': AdaBoostRegressor(),
-        #     'params': {
-        #         'n_estimators': [50, 100, 200],  # Number of boosting stages
-        #         'learning_rate': [0.01, 0.1, 0.5]  # Shrinks the contribution of each estimator
-        #     }
-        # },
-        # 'ExtraTrees': {
-        #     'model': ExtraTreesRegressor(),
-        #     'params': {
-        #         'n_estimators': [100, 200, 500],  # Number of trees in the forest
-        #         'max_depth': [None, 10, 20],  # Maximum depth of the tree
-        #         'min_samples_split': [2, 5, 10]  # Minimum number of samples required to split a node
-        #     }
-        # }
+        'GradientBoosting': {
+            'model': GradientBoostingRegressor(),
+            'params': {
+                'n_estimators': [100, 200, 500],  # Number of boosting stages
+                'learning_rate': [0.01, 0.05, 0.1],  # Step size shrinkage used in each boosting step
+                'max_depth': [3, 5, 10],  # Maximum depth of individual estimators
+                'min_samples_split': [2, 5, 10],  # Minimum number of samples required to split a node
+                'subsample': [0.8, 1.0]  # Fraction of samples used for fitting the individual estimators
+            }
+        },
+        'NeuralNetwork': {
+            'model': MLPRegressor(max_iter=1000),  # Neural network regressor
+            'params': {
+                'hidden_layer_sizes': [(50,), (100,), (100, 100)],  # Size of the hidden layers
+                'activation': ['relu', 'tanh'],  # Activation functions
+                'solver': ['adam', 'lbfgs'],  # Solver for weight optimization
+                'learning_rate_init': [0.001, 0.01]  # Initial learning rate
+            }
+        },
+        'Ridge': {
+            'model': Ridge(),
+            'params': {
+                'alpha': [0.01, 0.1, 1.0, 10.0, 100.0]  # Regularization strength
+            }
+        },
+        'AdaBoost': {
+            'model': AdaBoostRegressor(),
+            'params': {
+                'n_estimators': [50, 100, 200],  # Number of boosting stages
+                'learning_rate': [0.01, 0.1, 0.5]  # Shrinks the contribution of each estimator
+            }
+        },
+        'ExtraTrees': {
+            'model': ExtraTreesRegressor(),
+            'params': {
+                'n_estimators': [100, 200, 500],  # Number of trees in the forest
+                'max_depth': [None, 10, 20],  # Maximum depth of the tree
+                'min_samples_split': [2, 5, 10]  # Minimum number of samples required to split a node
+            }
+        }
     }
 
 # Meta-Learner Helper Functions
@@ -164,8 +154,8 @@ def grid_search_cv(X_train, y_train, treatment_train, model, params, meta_learne
 # Main function to apply grid search across meta-learners and models
 def apply_grid_search(param_grids, X_train, y_train, treatment_train):
     results = []
-    # meta_learners = ['S-Learner','T-Learner', 'X-Learner', 'R-Learner'] # all meta_learners
-    meta_learners = ['S-Learner'] #, 'S-Learner' only
+    meta_learners = ['S-Learner','T-Learner', 'X-Learner', 'R-Learner'] # all meta_learners
+    # meta_learners = ['S-Learner'] #, 'S-Learner' only
     # meta_learners = ['T-Learner'] #, 'T-Learner' only
     # meta_learners = ['X-Learner'] #, 'X-Learner' only
     # meta_learners = ['R-Learner'] #, 'R-Learner' only
@@ -224,8 +214,12 @@ def apply_grid_search(param_grids, X_train, y_train, treatment_train):
                 raise ValueError(f"Unknown meta-learner: {learner}")
             
             # Calculate metrics using functions from evaluate.py
-            rmse = compute_rmse(y_train, predictions)
-            emse = bootstrap_emse(X_train, y_train, treatment_train, best_model, learner)
+            if learner != 'R-Learner':
+                rmse = compute_rmse(y_train, predictions)
+            else:
+                rmse = None
+            emse = bootstrap_emse_no_groundtruth(X_train, treatment_train, best_model, learner)
+
 
             # Append the result
             results.append({
@@ -234,10 +228,13 @@ def apply_grid_search(param_grids, X_train, y_train, treatment_train):
                 'best_rmse': rmse,
                 'best_emse': emse,
                 'best_params': best_params
+                
             })
+            # if rmse is not None:
+            #     print(f"{learner} {model_name} Results: Best RMSE={rmse:.4f}, Best EMSE={emse:.4f}")
+            # else:
+            #     print(f"{learner} {model_name} Results: Best RMSE={rmse}, Best EMSE={emse:.4f}")
 
-            print(f"{learner} {model_name} Results: Best RMSE={rmse:.4f}, Best EMSE={emse:.4f}")
-    
     return pd.DataFrame(results)
 
 
@@ -255,14 +252,13 @@ if __name__ == '__main__':
     results_df = apply_grid_search(param_grid, X_train, y_train, treatment_train)
     
     # Save and print results
-    # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results.csv', index=False) # all_meta_learners 
-    results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_S_learner_test.csv', index=False) # S_learner
+    results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results.csv', index=False) # all_meta_learners 
+    # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_S_learner_test.csv', index=False) # S_learner
     # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_T_learner.csv', index=False) # T_learner
     # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_X_learner.csv', index=False) # X_learner
     # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_R_learner.csv', index=False) # R_learner
 
-
-    print(results_df)
+    # print(results_df)
 
     # End timing
     end_time = time.time()

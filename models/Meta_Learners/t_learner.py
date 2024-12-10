@@ -1,4 +1,4 @@
-from sklearn.ensemble import GradientBoostingRegressor
+from models.Meta_Learners.meta_learner_models import T_learner_model
 import pandas as pd
 
 def t_fit(data, treatment_col, outcome_col, covariate_cols):
@@ -10,11 +10,11 @@ def t_fit(data, treatment_col, outcome_col, covariate_cols):
     X_control = control_data[covariate_cols]
     y_control = control_data[outcome_col]
 
-    # Gradient Boosting models with specified parameters for treated and control groups
-    model_treated = GradientBoostingRegressor(learning_rate=0.1, max_depth=3, min_samples_split=10,
-                                              n_estimators=100, subsample=0.8, random_state=42)
-    model_control = GradientBoostingRegressor(learning_rate=0.05, max_depth=3, min_samples_split=5,
-                                              n_estimators=200, subsample=0.8, random_state=42)
+    T_learner_model_control, T_learner_model_treated = T_learner_model
+    
+    # T-Learner: AdaBoost
+    model_control = T_learner_model_control
+    model_treated = T_learner_model_treated
 
     model_treated.fit(X_treated, y_treated)
     model_control.fit(X_control, y_control)

@@ -59,7 +59,6 @@ def standardize_categorical_and_numerical_features(continuous_cols):
     preprocessor = ColumnTransformer(
         transformers=[
             ('num', StandardScaler(), continuous_cols)
-            # ('cat', OneHotEncoder(drop='first'), categorical_cols)  # drop='first' to avoid collinearity
         ],
         remainder='passthrough'  # passthrough the remaining columns (if any)
     )   
