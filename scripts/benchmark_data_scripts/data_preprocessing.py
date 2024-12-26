@@ -75,7 +75,8 @@ def split_per_hypothesis_for_test(x, hypothesis):
     X_train, X_test, y_train, y_test = train_test_split(x, hypothesis, test_size=0.3, random_state=42)
     treatment_train = X_train["Treatment"].values  # Extract Treatment column for training
     treatment_test = X_test["Treatment"].values  # Extract Treatment column for testing
-
+    print(f"X_train:{X_train}")
+    print(f"y_train:{y_train}")
 
     return X_train, X_test, y_train, y_test, treatment_train, treatment_test
 

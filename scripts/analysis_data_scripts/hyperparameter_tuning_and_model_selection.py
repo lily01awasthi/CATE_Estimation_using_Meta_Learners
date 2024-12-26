@@ -218,8 +218,9 @@ def apply_grid_search(param_grids, X_train, y_train, treatment_train):
                 rmse = compute_rmse(y_train, predictions)
             else:
                 rmse = None
+                
             emse = bootstrap_emse_no_groundtruth(X_train, treatment_train, best_model, learner)
-
+            
 
             # Append the result
             results.append({
