@@ -170,11 +170,12 @@ def evaluate_meta_learner(predictions, y_test, treatment_test, learner_name):
         predictions['pred_control']   # Use control predictions for control individuals
     )
     
-    # Compute evaluation metrics
+    # Compute evaluation metrics rmse, bias, and variance
     rmse = np.sqrt(mean_squared_error(y_test, predicted_outcomes))
     bias = np.mean(predicted_outcomes - y_test)
     variance = np.var(predicted_outcomes)
 
+    # Store metrics in a dictionary
     metrics = {
         f'{learner_name}_RMSE': rmse,
         f'{learner_name}_Bias': bias,
