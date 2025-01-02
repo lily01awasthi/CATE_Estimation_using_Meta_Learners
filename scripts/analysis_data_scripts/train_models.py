@@ -121,7 +121,7 @@ if __name__ == '__main__':
     s_predictions, t_predictions, x_predictions, r_predictions = train_predictor.train_and_predict()
     s_estimates, t_estimates, x_estimates, r_estimates = train_predictor.get_cate_estimates(s_predictions, t_predictions, x_predictions, r_predictions)
 
-    # Save the CATE estimates to a CSV file
+    # Save the outcome predictions to a CSV file
     s_output_path = 'results/analysis_data_results/test_data/s_predictions.csv'
     # s_output_path_extratrees = 'results/analysis_data_results/test_data//s_predictions_withExtratrees.csv'
     t_output_path = 'results/analysis_data_results/test_data/t_predictions.csv'

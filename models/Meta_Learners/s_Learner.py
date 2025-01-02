@@ -27,3 +27,6 @@ def predict_outcomes_s(X, model, treatment_col):
 
 def estimate_CATE_s(df):
     return df['pred_treated'] - df['pred_control']
+
+
+

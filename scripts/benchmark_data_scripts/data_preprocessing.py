@@ -15,7 +15,10 @@ def preprocess_data(training_data, ground_truth):
     # Filter relevant rows based on the "Type" column
     filtered_training_data = training_data[training_data["Type"].isin(["Checkin", "Checkout"])]
 
-    # Handle missing values in the "IsCorrect" column by removing rows (or imputing if necessary)
+    # check how many rows are null in the "IsCorrect" column
+    print(f"number of null rows in iscorrect column :{filtered_training_data.isna().sum()}") 
+
+    # Handle missing values in the "IsCorrect" column by removing rows 
     filtered_training_data = filtered_training_data.dropna(subset=["IsCorrect"])
 
     # Convert the "Timestamp" column to datetime if needed
@@ -75,8 +78,8 @@ def split_per_hypothesis_for_test(x, hypothesis):
     X_train, X_test, y_train, y_test = train_test_split(x, hypothesis, test_size=0.3, random_state=42)
     treatment_train = X_train["Treatment"].values  # Extract Treatment column for training
     treatment_test = X_test["Treatment"].values  # Extract Treatment column for testing
-    print(f"X_train:{X_train}")
-    print(f"y_train:{y_train}")
+    # print(f"X_train:{X_train}")
+    # print(f"y_train:{y_train}")
 
     return X_train, X_test, y_train, y_test, treatment_train, treatment_test
 
