@@ -11,11 +11,11 @@ This directory hosts all datasets used in the project, split into two main subdi
 
 #### `analysis_data`
 - `dataset.csv`: The primary dataset used for initial analysis.
-- `analysis_data_description.md`: Describes the dataset, including its features.
+- [analysis_data_description.md](./data/analysis_data/analysis_data_description.md): Describes the dataset, including its features and the preprocessing steps applied.
 
 #### `benchmark_data`
 - `checkins_lessions_checkouts_training.csv` and `construct_experiments_ates_test.csv`: Raw data files used to generate the benchmark dataset through specific filtration processes described within.
-- `benchmark_data_description.md`: Provides details on the benchmark dataset, including its creation and characteristics.
+- [benchmark_data_description.md](./data/benchmark_data/benchmark_data_description.md): Provides details on the benchmark dataset, including its creation and characteristics.
 
 ### `docs`
 - `Estimation_of_CATE_using_Meta_Learners.pdf`: Contains the comprehensive thesis document detailing the theoretical background, methodology, and findings of the project.
