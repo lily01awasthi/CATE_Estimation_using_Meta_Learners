@@ -1,16 +1,55 @@
-# CATE_Estimation_using_Meta_Learners
-Applying meta-learner models (T, S, X, R-learners) to estimate CATE in educational interventions. Project aims to analyze treatment effects using machine learning models.
-# This Project is focused on following Research Questions
-## Causal Inference with Different Meta-Learners:
-* Question: "How do different meta-learners (T-Learner, S-Learner, X-Learner, R-Learner) compare in estimating the Conditional Average Treatment Effect (CATE) in educational settings with binary treatment?"
-* Context: Given the binary nature of the treatment, a thorough comparison of meta-learners could reveal which method provides the most accurate or interpretable results in this context.
-* Hypothesis: One meta-learner might perform consistently better than others in capturing the true CATE, possibly due to the nature of the educational intervention and the structure of the data.
-## Heterogeneous Treatment Effects Across Student and School Demographics:
+# Estimation of CATE using Meta-Learners
 
-* Question: "How does the effectiveness of the growth mindset intervention (Z) on student achievement vary across different demographic groups and school contexts?"
-* Context: Examine how the treatment effect (CATE) differs for students of different races/ethnicities, genders, and socioeconomic backgrounds, as well as in different types of schools (urban vs. rural, high vs. low achievement levels, etc.).
-* Hypothesis: The intervention might be more effective in certain demographics or school settings, such as schools with higher poverty rates or for first-generation college students.
-## Interaction Effects Between Student-Level and School-Level Variables:
-* Question: "What are the interaction effects between student-level and school-level covariates on the effectiveness of the growth mindset intervention?"
-* Context: Explore how combinations of student-level factors (e.g., race, gender, first-generation status) and school-level factors (e.g., urbanicity, school achievement level) influence the treatment effect.
-* Hypothesis: There could be significant interaction effects, such as the intervention being particularly effective for minority students in low-achieving schools, or less effective in high-poverty schools regardless of other factors.
+This repository contains all materials related to the project "Estimation of CATE using Meta-Learners (T, S, X, R-learners)", aimed at exploring Conditional Average Treatment Effects (CATE) using various meta-learner models on two distinct datasets: analysis data and benchmark data.
+
+## Project Structure
+
+The project is organized into several directories, each serving a specific purpose in the analysis and implementation of CATE estimation methods. Below is a detailed explanation of each directory and its contents:
+
+### `data`
+This directory hosts all datasets used in the project, split into two main subdirectories:
+
+#### `analysis_data`
+- `dataset.csv`: The primary dataset used for initial analysis.
+- `analysis_data_description.md`: Describes the dataset, including its features.
+
+#### `benchmark_data`
+- `checkins_lessions_checkouts_training.csv` and `construct_experiments_ates_test.csv`: Raw data files used to generate the benchmark dataset through specific filtration processes described within.
+- `benchmark_data_description.md`: Provides details on the benchmark dataset, including its creation and characteristics.
+
+### `docs`
+- `Estimation_of_CATE_using_Meta_Learners.pdf`: Contains the comprehensive thesis document detailing the theoretical background, methodology, and findings of the project.
+
+### `models`
+This directory contains scripts for the meta-learner models used to analyze both datasets:
+
+#### `Meta_Learners` and `Meta_Learners_benchmark_data`
+Each contains identical scripts (`meta_learner_models.py`, `s_learner.py`, `t_learner.py`, `x_learner.py`, `r_learner.py`). These scripts implement different meta-learner models. They are functionally the same but are tuned to the specifics of the analysis and benchmark datasets respectively.
+
+### `notebooks`
+Jupyter notebooks that document the experimental process and findings for each dataset:
+
+#### `analysis_data_notebooks` and `benchmark_data_notebooks`
+Series of experiments (`Exp1` to `Exp5`) detailing data preprocessing, hyperparameter tuning, model selection, performance evaluation, and in-depth analyses of CATE estimates across various conditions and demographics.
+
+### `results`
+Contains output from the experiments, including model evaluation metrics and CATE estimates:
+
+#### `analysis_data_results` and `benchmark_data_results`
+Stores results of grid search, CATE estimates by PSM, and meta-learner predictions on test datasets.
+
+### `scripts`
+Scripts used for data preprocessing, model evaluation, hyperparameter tuning, and training across both datasets:
+
+#### `analysis_data_scripts` and `benchmark_data_scripts`
+Includes Python scripts like `data_preprocessor.py`, `evaluate_models.py`, `hyperparameter_tuning_and_model_selection.py`, and `train_models.py`. These scripts are integral to preparing the data, tuning, and training the models for both the analysis and benchmark datasets.
+
+### `requirements.txt`
+Contains all the necessary Python packages required to run the project. Ensure you install these dependencies to avoid any runtime issues.
+
+## Getting Started
+
+To get started with this project, clone the repository and install the required packages using:
+
+```bash
+pip install -r requirements.txt
