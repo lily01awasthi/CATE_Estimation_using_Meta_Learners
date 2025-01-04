@@ -38,8 +38,8 @@ Key covariates in the Ground Truth Data include:
 - **`ControlUsersCount`**: Number of students in the control group.
 - **`TreatmentUsersCount`**: Number of students in the treatment group.
 - **`ate_p_1__`**: Ground truth CATE for Hypothesis 1 (Excluding students who answered the check-in correctly but the check-out incorrectly ).
-- **`ate_k_1__`**: Ground truth CATE for Hypothesis 2 (Including students who answered the check-out
-correctly but the check-in incorrectly as ”random guessing).
+- **`ate_k_1__`**: Ground truth CATE for Hypothesis 2 (Including students who answered the check-in
+correctly but the check-out incorrectly as ”random guessing).
 
 ### Data Integration and Propensity Score Matching (PSM)
 
