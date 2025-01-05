@@ -1,6 +1,4 @@
 
-import sys
-import os
 import pandas as pd
 from scripts.benchmark_data_scripts.data_preprocessing import load_data, preprocess_data, split_data_for_test
 from sklearn.metrics import mean_squared_error
