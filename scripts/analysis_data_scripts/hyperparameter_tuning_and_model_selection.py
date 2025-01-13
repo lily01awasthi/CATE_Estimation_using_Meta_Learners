@@ -102,7 +102,7 @@ def x_learner_grid_search(X_train, y_train, treatment_train, model, params):
     grid_search_treated.fit(X_treated, y_treated)
     best_model_treated = grid_search_treated.best_estimator_
 
-    # Step 2: Estimate treatment effects for control and treated groups
+    # Estimate treatment effects for control and treated groups
     tau_control = y_control - best_model_treated.predict(X_control)
     tau_treated = best_model_control.predict(X_treated) - y_treated
 
@@ -110,7 +110,7 @@ def x_learner_grid_search(X_train, y_train, treatment_train, model, params):
     X_combined = np.vstack([X_control, X_treated])
     tau_combined = np.hstack([tau_control, tau_treated])
 
-    # Step 3: Train final CATE model on pseudo-outcomes
+    # Train final CATE model on pseudo-outcomes
     cate_model = GridSearchCV(estimator=model, param_grid=params, cv=5, scoring='neg_mean_squared_error', n_jobs=-1)
     cate_model.fit(X_combined, tau_combined)
 
@@ -231,10 +231,6 @@ def apply_grid_search(param_grids, X_train, y_train, treatment_train):
                 'best_params': best_params
                 
             })
-            # if rmse is not None:
-            #     print(f"{learner} {model_name} Results: Best RMSE={rmse:.4f}, Best EMSE={emse:.4f}")
-            # else:
-            #     print(f"{learner} {model_name} Results: Best RMSE={rmse}, Best EMSE={emse:.4f}")
 
     return pd.DataFrame(results)
 
@@ -254,7 +250,7 @@ if __name__ == '__main__':
     
     # Save and print results
     results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results.csv', index=False) # all_meta_learners 
-    # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_S_learner_test.csv', index=False) # S_learner
+    # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_S_learner.csv', index=False) # S_learner
     # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_T_learner.csv', index=False) # T_learner
     # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_X_learner.csv', index=False) # X_learner
     # results_df.to_csv('results/analysis_data_results/grid_search_results/grid_search_results_R_learner.csv', index=False) # R_learner

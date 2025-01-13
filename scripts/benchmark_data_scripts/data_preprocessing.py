@@ -15,9 +15,6 @@ def preprocess_data(training_data, ground_truth):
     # Filter relevant rows based on the "Type" column
     filtered_training_data = training_data[training_data["Type"].isin(["Checkin", "Checkout"])]
 
-    # check how many rows are null in the "IsCorrect" column
-    print(f"number of null rows in iscorrect column :{filtered_training_data.isna().sum()}") 
-
     # Handle missing values in the "IsCorrect" column by removing rows 
     filtered_training_data = filtered_training_data.dropna(subset=["IsCorrect"])
 
@@ -78,8 +75,6 @@ def split_per_hypothesis_for_test(x, hypothesis):
     X_train, X_test, y_train, y_test = train_test_split(x, hypothesis, test_size=0.3, random_state=42)
     treatment_train = X_train["Treatment"].values  # Extract Treatment column for training
     treatment_test = X_test["Treatment"].values  # Extract Treatment column for testing
-    # print(f"X_train:{X_train}")
-    # print(f"y_train:{y_train}")
 
     return X_train, X_test, y_train, y_test, treatment_train, treatment_test
 
@@ -92,7 +87,7 @@ def split_data_for_test(meta_learner_data):
     # Define features and target
     X = meta_learner_data.drop(columns=["TrueCATE_p", "TrueCATE_k"])
 
-    # Step 1: Create separate targets for both hypotheses
+    # Create separate targets for both hypotheses
     y_p_hypothesis_1 = meta_learner_data["TrueCATE_p"]  # Ground truth for Hypothesis 1 (ate_p_1__)
     y_k_hypothesis_2 = meta_learner_data["TrueCATE_k"]  # Ground truth for Hypothesis 2 (ate_k_1__)
 
@@ -112,10 +107,7 @@ def split_per_hypothesis(x, hypothesis):
 
 def split_data(meta_learner_data):
 
-    # Define features and target
-    # X = meta_learner_data.drop(columns=["TrueCATE_p", "TrueCATE_k"])
-
-    # Step 1: Create separate targets for both hypotheses
+    # Create separate targets for both hypotheses
     y_p_hypothesis_1 = meta_learner_data["TrueCATE_p"]  # Ground truth for Hypothesis 1 (ate_p_1__)
     y_k_hypothesis_2 = meta_learner_data["TrueCATE_k"]  # Ground truth for Hypothesis 2 (ate_k_1__)
 
@@ -131,63 +123,63 @@ if __name__ == '__main__':
     training_data, ground_truth = load_data(path="data/benchmark_data")
     meta_learner_data = preprocess_data(training_data, ground_truth)
     print(meta_learner_data.head())
-    # (X_train_p, X_test_p, y_train_p, y_test_p, treatment_train_p, treatment_test_p,X_train_k, 
-    #  X_test_k, y_train_k, y_test_k, treatment_train_k, treatment_test_k) = split_data_for_test(meta_learner_data)
+    (X_train_p, X_test_p, y_train_p, y_test_p, treatment_train_p, treatment_test_p,X_train_k, 
+     X_test_k, y_train_k, y_test_k, treatment_train_k, treatment_test_k) = split_data_for_test(meta_learner_data)
 
-    # # Evaluate S-Learner for Hypothesis 1 (ate_p_1__)
-    # s_learner_cate_p, s_learner_mse_p, s_learner_bias_p, s_learner_variance_p = s_learner(X_train_p, X_test_p, y_train_p, y_test_p)
+    # Evaluate S-Learner for Hypothesis 1 (ate_p_1__)
+    s_learner_cate_p, s_learner_mse_p, s_learner_bias_p, s_learner_variance_p = s_learner(X_train_p, X_test_p, y_train_p, y_test_p)
 
-    # # Evaluate S-Learner for Hypothesis 2 (ate_k_1__)
-    # s_learner_cate_k, s_learner_mse_k, s_learner_bias_k, s_learner_variance_k = s_learner(X_train_k, X_test_k, y_train_k, y_test_k)
+    # Evaluate S-Learner for Hypothesis 2 (ate_k_1__)
+    s_learner_cate_k, s_learner_mse_k, s_learner_bias_k, s_learner_variance_k = s_learner(X_train_k, X_test_k, y_train_k, y_test_k)
 
-    # # Output results
-    # print(f"S-Learner MSE (Hypothesis 1): {s_learner_mse_p}")
-    # print(f"S-Learner Bias (Hypothesis 1): {s_learner_bias_p}")
-    # print(f"S-Learner Variance (Hypothesis 1): {s_learner_variance_p}")
-    # print(f"S-Learner MSE (Hypothesis 2): {s_learner_mse_k}")
-    # print(f"S-Learner Bias (Hypothesis 2): {s_learner_bias_k}")
-    # print(f"S-Learner Variance (Hypothesis 2): {s_learner_variance_k}")
+    # Output results
+    print(f"S-Learner MSE (Hypothesis 1): {s_learner_mse_p}")
+    print(f"S-Learner Bias (Hypothesis 1): {s_learner_bias_p}")
+    print(f"S-Learner Variance (Hypothesis 1): {s_learner_variance_p}")
+    print(f"S-Learner MSE (Hypothesis 2): {s_learner_mse_k}")
+    print(f"S-Learner Bias (Hypothesis 2): {s_learner_bias_k}")
+    print(f"S-Learner Variance (Hypothesis 2): {s_learner_variance_k}")
 
-    # # Evaluate T-Learner for Hypothesis 1 (ate_p_1__)
-    # t_learner_cate_p, t_learner_mse_p, t_learner_bias_p, t_learner_variance_p = t_learner(X_train_p, X_test_p, y_train_p, y_test_p)
+    # Evaluate T-Learner for Hypothesis 1 (ate_p_1__)
+    t_learner_cate_p, t_learner_mse_p, t_learner_bias_p, t_learner_variance_p = t_learner(X_train_p, X_test_p, y_train_p, y_test_p)
 
-    # # Evaluate T-Learner for Hypothesis 2 (ate_k_1__)
-    # t_learner_cate_k, t_learner_mse_k, t_learner_bias_k, t_learner_variance_k = t_learner(X_train_k, X_test_k, y_train_k, y_test_k)
-    # print("........................................................................")
-    # # Output results
-    # print(f"T-Learner MSE (Hypothesis 1): {t_learner_mse_p}")
-    # print(f"T-Learner Bias (Hypothesis 1): {t_learner_bias_p}")
-    # print(f"T-Learner Variance (Hypothesis 1): {t_learner_variance_p}")
-    # print(f"T-Learner MSE (Hypothesis 2): {t_learner_mse_k}")
-    # print(f"T-Learner Bias (Hypothesis 2): {t_learner_bias_k}")
-    # print(f"T-Learner Variance (Hypothesis 2): {t_learner_variance_k}")
+    # Evaluate T-Learner for Hypothesis 2 (ate_k_1__)
+    t_learner_cate_k, t_learner_mse_k, t_learner_bias_k, t_learner_variance_k = t_learner(X_train_k, X_test_k, y_train_k, y_test_k)
+    print("........................................................................")
+    # Output results
+    print(f"T-Learner MSE (Hypothesis 1): {t_learner_mse_p}")
+    print(f"T-Learner Bias (Hypothesis 1): {t_learner_bias_p}")
+    print(f"T-Learner Variance (Hypothesis 1): {t_learner_variance_p}")
+    print(f"T-Learner MSE (Hypothesis 2): {t_learner_mse_k}")
+    print(f"T-Learner Bias (Hypothesis 2): {t_learner_bias_k}")
+    print(f"T-Learner Variance (Hypothesis 2): {t_learner_variance_k}")
 
-    # # Evaluate X-Learner for Hypothesis 1 (ate_p_1__)
-    # x_learner_cate_p, x_learner_mse_p, x_learner_bias_p, x_learner_variance_p = x_learner(X_train_p, X_test_p, y_train_p, y_test_p)
+    # Evaluate X-Learner for Hypothesis 1 (ate_p_1__)
+    x_learner_cate_p, x_learner_mse_p, x_learner_bias_p, x_learner_variance_p = x_learner(X_train_p, X_test_p, y_train_p, y_test_p)
 
-    # # Evaluate X-Learner for Hypothesis 2 (ate_k_1__)
-    # x_learner_cate_k, x_learner_mse_k, x_learner_bias_k, x_learner_variance_k = x_learner(X_train_k, X_test_k, y_train_k, y_test_k)
-    # print("........................................................................")
-    # # Output results
-    # print(f"X-Learner MSE (Hypothesis 1): {x_learner_mse_p}")
-    # print(f"X-Learner Bias (Hypothesis 1): {x_learner_bias_p}")
-    # print(f"X-Learner Variance (Hypothesis 1): {x_learner_variance_p}")
-    # print(f"X-Learner MSE (Hypothesis 2): {x_learner_mse_k}")
-    # print(f"X-Learner Bias (Hypothesis 2): {x_learner_bias_k}")
-    # print(f"X-Learner Variance (Hypothesis 2): {x_learner_variance_k}")
+    # Evaluate X-Learner for Hypothesis 2 (ate_k_1__)
+    x_learner_cate_k, x_learner_mse_k, x_learner_bias_k, x_learner_variance_k = x_learner(X_train_k, X_test_k, y_train_k, y_test_k)
+    print("........................................................................")
+    # Output results
+    print(f"X-Learner MSE (Hypothesis 1): {x_learner_mse_p}")
+    print(f"X-Learner Bias (Hypothesis 1): {x_learner_bias_p}")
+    print(f"X-Learner Variance (Hypothesis 1): {x_learner_variance_p}")
+    print(f"X-Learner MSE (Hypothesis 2): {x_learner_mse_k}")
+    print(f"X-Learner Bias (Hypothesis 2): {x_learner_bias_k}")
+    print(f"X-Learner Variance (Hypothesis 2): {x_learner_variance_k}")
 
-    # # Evaluate R-Learner for Hypothesis 1 (ate_p_1__)
-    # r_learner_cate_p, r_learner_mse_p, r_learner_bias_p, r_learner_variance_p = r_learner(X_train_p, X_test_p, y_train_p, y_test_p)
+    # Evaluate R-Learner for Hypothesis 1 (ate_p_1__)
+    r_learner_cate_p, r_learner_mse_p, r_learner_bias_p, r_learner_variance_p = r_learner(X_train_p, X_test_p, y_train_p, y_test_p)
 
-    # # Evaluate R-Learner for Hypothesis 2 (ate_k_1__)
-    # r_learner_cate_k, r_learner_mse_k, r_learner_bias_k, r_learner_variance_k = r_learner(X_train_k, X_test_k, y_train_k, y_test_k)
-    # print("........................................................................")
-    # # Output results
-    # print(f"R-Learner MSE (Hypothesis 1): {r_learner_mse_p}")
-    # print(f"R-Learner Bias (Hypothesis 1): {r_learner_bias_p}")
-    # print(f"R-Learner Variance (Hypothesis 1): {r_learner_variance_p}")
-    # print(f"R-Learner MSE (Hypothesis 2): {r_learner_mse_k}")
-    # print(f"R-Learner Bias (Hypothesis 2): {r_learner_bias_k}")
-    # print(f"R-Learner Variance (Hypothesis 2): {r_learner_variance_k}")
+    # Evaluate R-Learner for Hypothesis 2 (ate_k_1__)
+    r_learner_cate_k, r_learner_mse_k, r_learner_bias_k, r_learner_variance_k = r_learner(X_train_k, X_test_k, y_train_k, y_test_k)
+    print("........................................................................")
+    # Output results
+    print(f"R-Learner MSE (Hypothesis 1): {r_learner_mse_p}")
+    print(f"R-Learner Bias (Hypothesis 1): {r_learner_bias_p}")
+    print(f"R-Learner Variance (Hypothesis 1): {r_learner_variance_p}")
+    print(f"R-Learner MSE (Hypothesis 2): {r_learner_mse_k}")
+    print(f"R-Learner Bias (Hypothesis 2): {r_learner_bias_k}")
+    print(f"R-Learner Variance (Hypothesis 2): {r_learner_variance_k}")
 
 

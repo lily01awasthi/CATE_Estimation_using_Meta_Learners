@@ -20,12 +20,12 @@ def calculate_psm(data, features, outcome, treatment, true_cate, hypothesis_name
     Returns:
     - Results dictionary containing RMSE, bias, variance, and CATE estimates.
     """
-    # Step 1: Estimate propensity scores
+    # Estimate propensity scores
     logistic_model = LogisticRegression(max_iter=1000)
     logistic_model.fit(data[features], data[treatment])
     data['propensity_score'] = logistic_model.predict_proba(data[features])[:, 1]
 
-    # Step 2: Perform Nearest Neighbor Matching
+    # Perform Nearest Neighbor Matching
     treated = data[data[treatment] == 1]
     control = data[data[treatment] == 0]
     nn = NearestNeighbors(n_neighbors=1)
@@ -40,7 +40,7 @@ def calculate_psm(data, features, outcome, treatment, true_cate, hypothesis_name
     matched_treated = treated[matched_indices]
     matched_control = control.iloc[indices.flatten()[matched_indices]]
 
-    # Step 3: Estimate CATE
+    # Estimate CATE
     cate_estimates = matched_treated[outcome].values - matched_control[outcome].values
 
     # Evaluate RMSE, bias, and variance if ground truth CATE is available

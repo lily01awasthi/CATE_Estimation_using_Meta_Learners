@@ -9,15 +9,15 @@ if __name__ == '__main__':
     (X_train_p, X_test_p, y_train_p, y_test_p, treatment_train_p, treatment_test_p,X_train_k, 
      X_test_k, y_train_k, y_test_k, treatment_train_k, treatment_test_k) = split_data_for_test(meta_learner_data)
 
-    # # Define parameter grids and apply grid search
-    # param_grid = get_param_grid()
+    # Define parameter grids and apply grid search
+    param_grid = get_param_grid()
 
-    # # Apply grid search for the main model for hypothesis 1 (ate_p_1__)
-    # results_df = apply_grid_search(param_grid, X_train_p, y_train_p, treatment_train_p)
-    # print(results_df)
-    # results_df.to_csv('results/benchmark_data_results/grid_search_results/test_grid_search_results_hypothesis_p.csv', index=False) 
+    # Apply grid search for the main model for hypothesis 1 (ate_p_1__)
+    results_df = apply_grid_search(param_grid, X_train_p, y_train_p, treatment_train_p)
+    print(results_df)
+    results_df.to_csv('results/benchmark_data_results/grid_search_results/test_grid_search_results_hypothesis_p.csv', index=False) 
 
-    # # Apply grid search for the main model for hypothesis 2 (ate_k_1__)
-    # results_df = apply_grid_search(param_grid, X_train_k, y_train_k, treatment_train_k)
-    # results_df.to_csv('results/benchmark_data_results/grid_search_results/test_grid_search_results_hypothesis_k.csv', index=False)
+    # Apply grid search for the main model for hypothesis 2 (ate_k_1__)
+    results_df = apply_grid_search(param_grid, X_train_k, y_train_k, treatment_train_k)
+    results_df.to_csv('results/benchmark_data_results/grid_search_results/test_grid_search_results_hypothesis_k.csv', index=False)
     

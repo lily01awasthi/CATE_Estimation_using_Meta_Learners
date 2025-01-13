@@ -32,6 +32,7 @@ Jupyter notebooks that document the experimental process and findings for each d
 #### `analysis_data_notebooks` and `benchmark_data_notebooks`
 Series of experiments (`Exp1` to `Exp5`) detailing data preprocessing, hyperparameter tuning, model selection, performance evaluation, and in-depth analyses of CATE estimates across various conditions and demographics.
 
+
 ### `results`
 Contains output from the experiments, including model evaluation metrics and CATE estimates:
 
@@ -49,7 +50,27 @@ Contains all the necessary Python packages required to run the project. Ensure y
 
 ## Getting Started
 
-To get started with this project, clone the repository and install the required packages using:
+* To get started with this project, clone the repository and install the required packages using:
 
 ```bash
 pip install -r requirements.txt
+
+```
+
+* Go to  notebooks under which you will find two directories. 
+    * analysis_data_notebooks
+    * benchmark_dataset_notebooks
+* Each of them have five notebooks that Explore, Analyze, tune the hyperparameters,select best performing model, estimate cate using meta-learner, compare the meta-learner prformances, estimate cate using PSM method and evalute the meta-learners for individual dataset.
+    * analysis_data_notebooks
+        * Exp1.Data Preprocessing and Exploration.ipynb 
+        * Exp2.Hyperparameter_Tuning_and_model_Selection.ipynb
+        * Exp3.Performance_of_each_meta_learner_on_test_set.ipynb
+        * Exp4.CATE_with_PSM.ipynb
+        * Exp5.Estimated_CATE_across_demographics.ipynb
+    * benchmark_dataset_notebooks
+        * Exp1.Performance_of_meta_learners_on_benchmark_data.ipynb
+        * Exp2.Hyperparameter_Tuning_and_model_Selection.ipynb
+        * Exp3.CATE_with_PSM.ipynb
+        * Exp4.correlation_in_cate_estimates_by_meta_learners.ipynb
+        * Exp5.cate_accuracy_across_sample_sizes.ipynb
+* please run each notebook to see the results, which are explained in the notebook itself. 

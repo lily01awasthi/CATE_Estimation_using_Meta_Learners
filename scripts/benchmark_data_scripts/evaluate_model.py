@@ -1,12 +1,13 @@
 
 import numpy as np
 from scripts.analysis_data_scripts.evaluate_models import compute_rmse, bootstrap_emse
+
 # Function to compute RMSE and EMSE
 def evaluate_model(X_train, y_train, treatment_train, model, meta_learner):
     """
     Evaluate a given model using RMSE and bootstrap EMSE.
     """
-    # Compute RMSE on the training set
+    # Compute RMSE for each meta-learner
     if meta_learner == 'S-Learner':
         X_combined = np.column_stack([X_train, treatment_train])
         y_pred = model.predict(X_combined)

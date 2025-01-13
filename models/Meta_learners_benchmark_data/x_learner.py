@@ -4,7 +4,7 @@ from models.Meta_learners_benchmark_data.meta_learner_models import X_learner_mo
 
 def x_learner(X_train, X_test, y_train):
     
-    # Step 3: Standardize the features
+    # Standardize the features
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train.drop(columns=["Treatment"]))
     X_test_scaled = scaler.transform(X_test.drop(columns=["Treatment"]))

@@ -17,7 +17,7 @@ def r_learner(X_train, X_test, y_train, hypothesis):
     # Predict treatment probabilities (propensity scores) 
     e_hat = cross_val_predict(propensity_model, X_train_scaled, X_train["Treatment"], cv=5, method="predict_proba")[:, 1]
 
-    # Step 5: Train outcome model and calculate residuals 
+    # Train outcome model and calculate residuals 
     if hypothesis == "k":
         outcome_model = R_learner_model_k
     else:
@@ -35,7 +35,7 @@ def r_learner(X_train, X_test, y_train, hypothesis):
     # Handle potential division by zero
     t_residual = np.where(t_residual == 0, np.finfo(float).eps, t_residual)
 
-    # Step 6: Clip and scale residuals to handle extreme values 
+    # Clip and scale residuals to handle extreme values 
     epsilon = 1e-3  # Threshold for clipping
     t_residual_clipped = np.clip(t_residual, epsilon, None)
 
@@ -56,11 +56,11 @@ def r_learner(X_train, X_test, y_train, hypothesis):
     # Check for extreme values
     residual_target = np.clip(residual_target, -1e6, 1e6)  # Clip excessively large values
 
-    # Step 7: Train R-Learner model 
+    # Train R-Learner model 
     r_learner_model = Ridge(alpha=10.0)
     r_learner_model.fit(X_train_scaled, residual_target)
 
-    # Step 8: Predict treatment effects on test set 
+    # Predict treatment effects on test set 
     r_learner_cate = r_learner_model.predict(X_test_scaled)
 
     return r_learner_cate

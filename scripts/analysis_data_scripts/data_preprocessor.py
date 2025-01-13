@@ -1,21 +1,4 @@
-# Key preprocessing steps 
-"""
-Key Preprocessing Steps:
-Column Renaming:
 
-Renamed columns for clarity, making the dataset more interpretable, particularly by giving descriptive names to variables related to student achievement, mindset intervention, and demographics.
-Defining Covariates, Treatment, and Outcome:
-
-Covariates: Includes student-level and school-level features, such as future expectations, race, gender, first-gen status, school characteristics (urbanicity, minority composition), and more.
-Treatment: Whether the student received the growth mindset intervention (binary).
-Outcome: The student achievement score post-intervention.
-Train-Test Split:
-
-Split the data into training and testing sets using stratification on the treatment variable, which is a good practice to handle imbalanced treatment groups.
-Standardization and One-Hot Encoding:
-
-Standardized continuous covariates (like school achievement level, minority composition, etc.) and one-hot encoded categorical variables (such as race, gender, and school urbanicity). This ensures that the machine learning models are fed properly scaled and encoded data.
-"""
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer

@@ -8,7 +8,7 @@ def s_learner(X_train, X_test, y_train, treatment_col="Treatment"):
     model = S_learner_model
     model.fit(X_train, y_train)
 
-    # Step 3: Make predictions for treated and control groups
+    # Make predictions for treated and control groups
     # Create copies of X_test to modify Treatment column
     X_test_treated = X_test.copy()
     X_test_treated[treatment_col] = 1  # Set Treatment = 1 for treated group

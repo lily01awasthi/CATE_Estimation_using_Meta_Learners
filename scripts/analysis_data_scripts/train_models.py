@@ -14,13 +14,14 @@ from models.Meta_Learners.meta_learner_models import S_learner_model, T_learner_
 class TrainAndPredict:
     def __init__(self, X_train, y_train, treatment_train, X_test,treatment_test):
         """
-        Initialize the TrainAndPredict class with preprocessed data.
+        Initialize the TrainAndPredict class with training and test data.
 
         Parameters:
-        X_train: pd.DataFrame, the covariates of the training set
-        y_train: np.array, the outcome variable of the training set
-        treatment_train: np.array, the treatment assignment of the training set
-        X_test: pd.DataFrame, the covariates of the test set
+        X_train: DataFrame, training covariates
+        y_train: training outcomes
+        treatment_train: training treatment assignments
+        X_test: test covariates
+        treatment_test: test treatment assignments
         """
         self.X_train = X_train
         self.y_train = y_train
@@ -30,12 +31,12 @@ class TrainAndPredict:
 
     def extract_features(self):
         """
-        Extract column names for treatment, outcome, and covariates.
+        Extract the treatment, outcome, and covariate columns from the training data.
 
         Returns:
-        treatment_col: str, treatment assignment column name
-        outcome_col: str, outcome variable column name
-        covariate_cols: list of str, covariate variable column names
+        treatment_col: str, the name of the treatment column
+        outcome_col: str, the name of the outcome column
+        covariate_cols: list of str, the names of the covariate columns
         """
         treatment_col = 'GrowthMindsetIntervention'
         outcome_col = 'SchoolAchievementLevel'
@@ -43,6 +44,22 @@ class TrainAndPredict:
         return treatment_col, outcome_col, covariate_cols
     
     def get_cate_estimates(self,s_predictions, t_predictions, x_predictions, r_predictions):
+        """
+        Get the CATE estimates for each meta-learner.
+        
+        Parameters:
+        s_predictions: array, predicted outcomes form the S-Learner
+        t_predictions: array, predicted outcomes from the T-Learner
+        x_predictions: array, predicted outcomes from the X-Learner
+        r_predictions: array, predicted cate from the R-Learner
+        
+        Returns:
+        data_with_s_cate: DataFrame with CATE estimates for the S-Learner
+        data_with_t_cate: DataFrame with CATE estimates for the T-Learner
+        data_with_x_cate: DataFrame with CATE estimates for the X-Learner
+        data_with_r_cate: DataFrame with CATE estimates for the R-Learner
+        
+        """
         
         s_cate = estimate_CATE_s(s_predictions)
         data_with_s_cate = self.X_test.copy()
@@ -123,7 +140,6 @@ if __name__ == '__main__':
 
     # Save the outcome predictions to a CSV file
     s_output_path = 'results/analysis_data_results/test_data/s_predictions.csv'
-    # s_output_path_extratrees = 'results/analysis_data_results/test_data//s_predictions_withExtratrees.csv'
     t_output_path = 'results/analysis_data_results/test_data/t_predictions.csv'
     x_output_path = 'results/analysis_data_results/test_data/x_predictions.csv'
     r_output_path = 'results/analysis_data_results/test_data/r_predictions.csv'
