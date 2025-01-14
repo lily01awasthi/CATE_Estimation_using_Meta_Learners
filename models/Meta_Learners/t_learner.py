@@ -2,9 +2,12 @@ from models.Meta_Learners.meta_learner_models import T_learner_model
 import pandas as pd
 
 def t_fit(data, treatment_col, outcome_col, covariate_cols):
+
+    # Splitting the data into treated and control groups
     treated_data = data[data[treatment_col] == 1]
     control_data = data[data[treatment_col] == 0]
 
+    # Creating the covariates and outcome variables for the treated and control groups
     X_treated = treated_data[covariate_cols]
     y_treated = treated_data[outcome_col]
     X_control = control_data[covariate_cols]
@@ -12,7 +15,7 @@ def t_fit(data, treatment_col, outcome_col, covariate_cols):
 
     T_learner_model_control, T_learner_model_treated = T_learner_model
     
-    # T-Learner: AdaBoost
+    # Fitting the T-learner models
     model_control = T_learner_model_control
     model_treated = T_learner_model_treated
 
@@ -22,6 +25,7 @@ def t_fit(data, treatment_col, outcome_col, covariate_cols):
     return model_treated, model_control
 
 def predict_outcomes_t(X, model_treated, model_control):
+    # Predicting the outcomes for the treated and control groups
     pred_treated = model_treated.predict(X)
     pred_control = model_control.predict(X)
 

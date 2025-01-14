@@ -2,10 +2,11 @@ import pandas as pd
 from models.Meta_Learners.meta_learner_models import S_learner_model
 
 def s_fit(data, treatment_col, outcome_col, covariate_cols):
-    # Create the covariates matrix and the outcome vector
+    # Createing the covariates matrix and the outcome vector
     X = data[covariate_cols + [treatment_col]]
     Y = data[outcome_col]
 
+    # Fitting the S-learner model
     model = S_learner_model  
     model.fit(X, Y)
 
@@ -14,6 +15,7 @@ def s_fit(data, treatment_col, outcome_col, covariate_cols):
 
 def predict_outcomes_s(X, model, treatment_col):
     
+    # Predicting the outcomes for the treated and control groups
     X_control = X.copy()
     X_control[treatment_col] = 0
     pred_0 = model.predict(X_control)

@@ -1,15 +1,15 @@
 from models.Meta_learners_benchmark_data.meta_learner_models import S_learner_model
 
 def s_learner(X_train, X_test, y_train, treatment_col="Treatment"):
-    # Ensure 'Treatment' is a column in X_train and X_test
+    # Ensuring 'Treatment' is a column in X_train and X_test
     if treatment_col not in X_train.columns:
         raise ValueError(f"The column '{treatment_col}' must be present in X_train and X_test.")
 
     model = S_learner_model
     model.fit(X_train, y_train)
 
-    # Make predictions for treated and control groups
-    # Create copies of X_test to modify Treatment column
+    # Makeing predictions for treated and control groups
+    # Creating copies of X_test to modify Treatment column
     X_test_treated = X_test.copy()
     X_test_treated[treatment_col] = 1  # Set Treatment = 1 for treated group
 
@@ -24,7 +24,7 @@ def s_learner(X_train, X_test, y_train, treatment_col="Treatment"):
     treated_outcomes = model.predict(X_test_treated)
     control_outcomes = model.predict(X_test_control)
 
-    # Estimate CATE
+    # Estimating CATE
     s_learner_cate = treated_outcomes - control_outcomes
 
     return s_learner_cate

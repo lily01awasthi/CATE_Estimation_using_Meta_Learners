@@ -8,7 +8,7 @@ def r_fit(data, treatment_col, outcome_col, covariate_cols):
     T = data[treatment_col]
     y = data[outcome_col]
 
-    # Use Ridge regression for residual modeling with best parameters
+    # Useing Ridge regression for residual modeling with best parameters
     y_model = cross_val_predict(R_learner_model, X, y, cv=5)
     t_model = cross_val_predict(R_learner_model, X, T, cv=5)
 
@@ -16,19 +16,19 @@ def r_fit(data, treatment_col, outcome_col, covariate_cols):
     y_residual = y - y_model
     t_residual = T - t_model
 
-    # Regularize treatment residuals to avoid division by zero
+    # Regularizing treatment residuals to avoid division by zero
     epsilon = 1e-3 * np.std(t_residual)
     t_residual_regularized = np.clip(t_residual, a_min=epsilon, a_max=None)
 
-    # Fit the Ridge model on residuals for CATE estimation
+    # Fitting the Ridge model on residuals for CATE estimation
     tau_model = R_learner_model
     tau_model.fit(X, y_residual / t_residual_regularized)
 
-    # Return the tau model
+    # Returning the tau model
     return tau_model
 
 def predict_outcomes_r(X, tau_model):
-    # Predict the treatment effect on the test data
+    # Predicting the treatment effect on the test data
     tau_pred = tau_model.predict(X)
     return pd.DataFrame({'tau_pred': tau_pred})
 

@@ -4,11 +4,11 @@ from sklearn.ensemble import AdaBoostRegressor
 
 def x_fit(data, treatment_col, outcome_col, covariate_cols):
     
-    # Split the data into treatment and control groups
+    # Spliting the data into treatment and control groups
     treated_data = data[data[treatment_col] == 1]
     control_data = data[data[treatment_col] == 0]
 
-    # Create the covariates matrix and the outcome vector for both groups
+    # Createing the covariates matrix and the outcome vector for both groups
     X_treated = treated_data[covariate_cols]
     y_treated = treated_data[outcome_col]
     X_control = control_data[covariate_cols]
@@ -16,7 +16,7 @@ def x_fit(data, treatment_col, outcome_col, covariate_cols):
 
     X_learner_model_control,X_learner_model_treated = X_learner_model
 
-    # Train separate models on the treated and control groups
+    # Training separate models on the treated and control groups
     model_treated = X_learner_model_treated
     model_control = X_learner_model_control
 
@@ -24,16 +24,16 @@ def x_fit(data, treatment_col, outcome_col, covariate_cols):
     model_treated.fit(X_treated, y_treated)
     model_control.fit(X_control, y_control)
 
-    # Estimate pseudo outcomes for CATE model training
+    # Estimateing pseudo outcomes for CATE model training
     tau_control = y_control - model_treated.predict(X_control)
     tau_treated = model_control.predict(X_treated) - y_treated
 
-    # Combine pseudo outcomes for final CATE model training
+    # Combining pseudo outcomes for final CATE model training
     X_combined = pd.concat([X_control, X_treated])
     tau_combined = pd.concat([pd.Series(tau_control, index=control_data.index),
                               pd.Series(tau_treated, index=treated_data.index)])
 
-    # Train CATE model
+    # Training CATE model
     cate_model = AdaBoostRegressor(learning_rate=0.01,n_estimators=50,random_state=42)
     cate_model.fit(X_combined, tau_combined)
 
@@ -41,6 +41,7 @@ def x_fit(data, treatment_col, outcome_col, covariate_cols):
 
 def predict_outcomes_x(X, model_treated, model_control, cate_model):
     
+    # Predicting the outcomes for the treated and control groups
     pred_treated = model_treated.predict(X)
     pred_control = model_control.predict(X)
     cate_estimates = cate_model.predict(X)

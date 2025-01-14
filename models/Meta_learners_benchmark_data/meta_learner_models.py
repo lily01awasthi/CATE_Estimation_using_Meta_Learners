@@ -33,7 +33,6 @@ T_learner_model_treated = RandomForestRegressor(
 T_learner_model = (T_learner_model_control, T_learner_model_treated)
 
 # X-Learner: Neural Network
-# {'control_params': {'activation': 'tanh', 'hidden_layer_sizes': (100, 100), 'learning_rate_init': 0.01, 'solver': 'lbfgs'}, 'treated_params': {'activation': 'relu', 'hidden_layer_sizes': (100,), 'learning_rate_init': 0.001, 'solver': 'lbfgs'}, 'cate_params': {'activation': 'tanh', 'hidden_layer_sizes': (100,), 'learning_rate_init': 0.001, 'solver': 'lbfgs'}}
 X_learner_model_treated = MLPRegressor(
     activation='relu',
     hidden_layer_sizes=(100,),
